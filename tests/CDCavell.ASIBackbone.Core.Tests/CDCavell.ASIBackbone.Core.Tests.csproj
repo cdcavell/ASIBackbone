@@ -21,6 +21,11 @@
     </PackageReference>
 
     <PackageReference Include="xunit.v3" />
+
+	<PackageReference Include="coverlet.msbuild">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>  
   </ItemGroup>
 
   <ItemGroup>
