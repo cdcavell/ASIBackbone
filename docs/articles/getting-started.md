@@ -47,7 +47,7 @@ cd ASIBackbone
 ## Restore, build, and test
 
 ```bash
-dotnet restore ASIBackbone.sinx
+dotnet restore ASIBackbone.slnx
 dotnet build ASIBackbone.slnx --configuration Release
 dotnet test ASIBackbone.slnx --configuration Release --no-build --no-restore
 ```
