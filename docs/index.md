@@ -12,6 +12,12 @@ ASIBackbone is a .NET governance and policy-control framework inspired by the AS
 * [Getting Started](articles/getting-started.md)
   Project orientation, local build instructions, and the current package direction.
 
+* [Core Domain Language](articles/core-domain-language.md)
+  Initial terminology and `0.1.0-alpha.1` Core boundary for governance spine, constraints, collapse boundary, actor context, decision results, audit residue, acknowledgment, capability tokens, and gateway boundaries.
+
+* [Alpha Package Boundary](articles/alpha-package-boundary.md)
+  Focused release-boundary guidance for `CDCavell.ASIBackbone.Core` before integration packages are added.
+
 * [Documentation Articles](articles/)
   Conceptual and implementation documentation for the ASI Backbone package family.
 
@@ -102,15 +108,17 @@ Current package.
 
 `CDCavell.ASIBackbone.Core` is the dependency-light foundation package. It defines shared contracts, domain abstractions, result primitives, and framework-neutral language used by the rest of the package family.
 
-Core should remain free of direct ASP.NET Core, Entity Framework Core, database-provider, and host-template assumptions.
+Core should remain free of direct ASP.NET Core, Entity Framework Core, database-provider, host-template, robotics, and AI-model assumptions.
 
 Primary responsibilities:
 
 * Core domain abstractions
 * Policy and constraint contracts
 * Decision result primitives
+* Operation result primitives
 * Acknowledgment and audit abstractions
 * Capability-token abstractions
+* Policy version and policy hash fields
 * Shared value objects
 * Framework-neutral domain language
 
