@@ -6,7 +6,7 @@ namespace CDCavell.ASIBackbone.Core.Results;
 /// <typeparam name="TValue">The result value type.</typeparam>
 public sealed class OperationResult<TValue> : OperationResult
 {
-    private readonly TValue? value;
+    private readonly TValue value;
 
     /// <summary>
     /// Initializes a new successful instance of the <see cref="OperationResult{TValue}"/> class.
@@ -33,6 +33,7 @@ public sealed class OperationResult<TValue> : OperationResult
         IReadOnlyList<string> warnings)
         : base(false, reasons, warnings)
     {
+        value = default!;
     }
 
     /// <summary>
@@ -41,9 +42,15 @@ public sealed class OperationResult<TValue> : OperationResult
     /// <exception cref="InvalidOperationException">
     /// Thrown when the operation result is failed and no successful value is available.
     /// </exception>
-    public TValue Value => Succeeded
-        ? value!
-        : throw new InvalidOperationException("Cannot access the value of a failed operation result.");
+    public TValue Value
+    {
+        get
+        {
+            return Succeeded
+                ? value
+                : throw new InvalidOperationException("Cannot access the value of a failed operation result.");
+        }
+    }
 
     /// <summary>
     /// Gets a value indicating whether a successful result value is available.
