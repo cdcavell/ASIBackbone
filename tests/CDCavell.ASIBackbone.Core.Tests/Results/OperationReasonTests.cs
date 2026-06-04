@@ -8,7 +8,7 @@ public sealed class OperationReasonTests
     [Fact]
     public void CreateNormalizesCodeAndMessage()
     {
-        OperationReason reason = OperationReason.Create(" validation.required ", " Required value missing. ");
+        var reason = OperationReason.Create(" validation.required ", " Required value missing. ");
 
         Assert.Equal("validation.required", reason.Code);
         Assert.Equal("Required value missing.", reason.Message);
@@ -19,14 +19,14 @@ public sealed class OperationReasonTests
     [Fact]
     public void CreateWithMetadataNormalizesKeysAndValues()
     {
-        Dictionary<string, string> metadata = new(StringComparer.Ordinal)
+        var metadata = new Dictionary<string, string>(StringComparer.Ordinal)
         {
             [" field "] = " Name ",
             ["   "] = "Ignored",
             ["policy"] = " v1 "
         };
 
-        OperationReason reason = OperationReason.Create(
+        var reason = OperationReason.Create(
             "policy.denied",
             "Policy denied the request.",
             metadata);
