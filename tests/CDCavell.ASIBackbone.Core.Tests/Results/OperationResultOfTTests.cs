@@ -8,7 +8,7 @@ public sealed class OperationResultOfTTests
     [Fact]
     public void SuccessCreatesSucceededResultWithValue()
     {
-        var result = OperationResult.Success("approved");
+        OperationResult<string> result = OperationResult.Success("approved");
 
         Assert.True(result.Succeeded);
         Assert.False(result.Failed);
@@ -21,7 +21,7 @@ public sealed class OperationResultOfTTests
     [Fact]
     public void SuccessWithWarningsStoresValueAndWarnings()
     {
-        var result = OperationResult.Success(42, [" Rounded value. "]);
+        OperationResult<int> result = OperationResult.Success(42, [" Rounded value. "]);
 
         Assert.True(result.Succeeded);
         Assert.True(result.HasValue);
@@ -32,7 +32,7 @@ public sealed class OperationResultOfTTests
     [Fact]
     public void FailureWithCodeAndMessageCreatesFailedResult()
     {
-        var result = OperationResult.Failure<string>(
+        OperationResult<string> result = OperationResult.Failure<string>(
             "validation.required",
             "Required value missing.");
 
@@ -45,11 +45,11 @@ public sealed class OperationResultOfTTests
     [Fact]
     public void FailureValueAccessThrows()
     {
-        var result = OperationResult.Failure<string>(
+        OperationResult<string> result = OperationResult.Failure<string>(
             "validation.required",
             "Required value missing.");
 
-        var exception = Assert.Throws<InvalidOperationException>(() => result.Value);
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() => result.Value);
 
         Assert.Equal("Cannot access the value of a failed operation result.", exception.Message);
     }
@@ -57,7 +57,7 @@ public sealed class OperationResultOfTTests
     [Fact]
     public void FailureWithMultipleReasonsStoresReasonCodes()
     {
-        var result = OperationResult.Failure<int>([
+        OperationResult<int> result = OperationResult.Failure<int>([
             OperationReason.Create("policy.denied", "Policy denied the request."),
             OperationReason.Create("constraint.failed", "Constraint failed.")
         ]);
@@ -69,10 +69,10 @@ public sealed class OperationResultOfTTests
     [Fact]
     public void FailureWithNoReasonsUsesDefaultFailureReason()
     {
-        var result = OperationResult.Failure<int>([]);
+        OperationResult<int> result = OperationResult.Failure<int>([]);
 
         Assert.False(result.Succeeded);
-        var reason = Assert.Single(result.Reasons);
+        OperationReason reason = Assert.Single(result.Reasons);
         Assert.Equal("operation.failed", reason.Code);
         Assert.Equal("Operation failed.", reason.Message);
     }
