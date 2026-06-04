@@ -79,7 +79,7 @@ jobs:
           /p:ThresholdType=line
           /p:ThresholdStat=total
 
-      - name: Pack Core package
+      - name: Pack packages
         run: >
           dotnet pack
           src/CDCavell.ASIBackbone.Core/CDCavell.ASIBackbone.Core.csproj
@@ -128,10 +128,10 @@ jobs:
           build-mode: none
 
       - name: Restore dependencies
-        run: dotnet restore ${{ env.SOLUTION_FILE }}
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
 
       - name: Build solution for CodeQL
-        run: dotnet build ${{ env.SOLUTION_FILE }} --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@87557b9c84dde89fdd9b10e88954ac2f4248e463 # v4
