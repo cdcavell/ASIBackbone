@@ -80,12 +80,27 @@ jobs:
           /p:ThresholdStat=total
 
       - name: Pack packages
-        run: >
-          dotnet pack
-          src/CDCavell.ASIBackbone.Core/CDCavell.ASIBackbone.Core.csproj
-          --configuration "$CONFIGURATION"
-          --no-build
-          --output "$PACKAGE_OUTPUT"
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$PACKAGE_OUTPUT"
+
+          mapfile -t package_projects < <(find ./src -name '*.csproj' -type f | sort)
+
+          if [ "${#package_projects[@]}" -eq 0 ]; then
+            echo "No package projects were found under ./src."
+            exit 1
+          fi
+
+          for project in "${package_projects[@]}"; do
+            echo "Packing $project"
+            dotnet pack "$project" \
+              --configuration "$CONFIGURATION" \
+              --no-build \
+              --output "$PACKAGE_OUTPUT" \
+              /p:ContinuousIntegrationBuild=true
+          done
 
       - name: Upload package artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

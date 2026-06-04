@@ -22,19 +22,19 @@ permissions:
   packages: write
 
 env:
-  CONFIGURATION: Release
-  PACKAGE_PROJECT: './NetCoreApplicationTemplate.Template.csproj'
-  PACKAGE_OUTPUT: './artifacts/template-package'
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  SOLUTION_PATH: ASIBackbone.slnx
+  CONFIGURATION: Release
+  PACKAGE_OUTPUT: ./artifacts/packages
 
 concurrency:
-  group: publish-template-package-${{ github.ref }}
+  group: publish-asi-backbone-packages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  pack-template:
-    name: Pack template package
+  pack-packages:
+    name: Pack packages
     runs-on: ubuntu-latest
 
     steps:
@@ -60,19 +60,34 @@ jobs:
           ./scripts/Validate-VersionConsistency.ps1 @arguments
 
       - name: Restore dependencies
-        run: dotnet restore ./NetCoreApplicationTemplate.slnx
+        run: dotnet restore "${{ env.SOLUTION_PATH }}"
 
       - name: Build solution
-        run: dotnet build ./NetCoreApplicationTemplate.slnx --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true
+        run: dotnet build "${{ env.SOLUTION_PATH }}" --configuration "${{ env.CONFIGURATION }}" --no-restore /p:ContinuousIntegrationBuild=true
 
-      - name: Pack template package
+      - name: Pack packages
+        shell: bash
         run: |
-          dotnet pack ${{ env.PACKAGE_PROJECT }} \
-            --configuration ${{ env.CONFIGURATION }} \
-            --output ${{ env.PACKAGE_OUTPUT }} \
-            /p:ContinuousIntegrationBuild=true
+          set -euo pipefail
 
-      - name: Validate generated package version
+          mkdir -p "${{ env.PACKAGE_OUTPUT }}"
+
+          mapfile -t package_projects < <(find ./src -name '*.csproj' -type f | sort)
+
+          if [ "${#package_projects[@]}" -eq 0 ]; then
+            echo "No package projects were found under ./src."
+            exit 1
+          fi
+
+          for project in "${package_projects[@]}"; do
+            echo "Packing $project"
+            dotnet pack "$project" \
+              --configuration "${{ env.CONFIGURATION }}" \
+              --output "${{ env.PACKAGE_OUTPUT }}" \
+              /p:ContinuousIntegrationBuild=true
+          done
+
+      - name: Validate generated package versions
         shell: pwsh
         run: |
           $arguments = @{
@@ -85,29 +100,29 @@ jobs:
 
           ./scripts/Validate-VersionConsistency.ps1 @arguments
 
-      - name: Upload template package artifact
+      - name: Upload package artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: template-package
+          name: asi-backbone-packages
           path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
           if-no-files-found: error
 
-  publish-template:
-    name: Publish template package
-    needs: pack-template
+  publish-packages:
+    name: Publish packages
+    needs: pack-packages
     runs-on: ubuntu-latest
 
     environment:
-      name: template-package-publish
+      name: package-publish
 
     if: github.event_name == 'push' || inputs.skip_publish == false
 
     steps:
-      - name: Download template package artifact
+      - name: Download package artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: template-package
-          path: ./artifacts/template-package
+          name: asi-backbone-packages
+          path: ./artifacts/packages
 
       - name: Resolve package source
         id: source
@@ -119,7 +134,7 @@ jobs:
             echo "url=https://api.nuget.org/v3/index.json" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Publish template package
+      - name: Publish packages
         shell: bash
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
@@ -127,15 +142,17 @@ jobs:
           PACKAGE_SOURCE: ${{ steps.source.outputs.url }}
         run: |
           set -euo pipefail
+          shopt -s nullglob
 
-          package=$(find ./artifacts/template-package -maxdepth 1 -name '*.nupkg' | head -n 1)
+          packages=(./artifacts/packages/*.nupkg)
 
-          if [ -z "$package" ]; then
-            echo "Template package artifact was not found."
+          if [ "${#packages[@]}" -eq 0 ]; then
+            echo "No package artifacts were found."
             exit 1
           fi
 
           api_key="$NUGET_API_KEY"
+
           if [ "$PACKAGE_SOURCE" = "https://nuget.pkg.github.com/cdcavell/index.json" ]; then
             api_key="$GITHUB_TOKEN"
           fi
@@ -145,7 +162,10 @@ jobs:
             exit 1
           fi
 
-          dotnet nuget push "$package" \
-            --api-key "$api_key" \
-            --source "$PACKAGE_SOURCE" \
-            --skip-duplicate
+          for package in "${packages[@]}"; do
+            echo "Publishing $package to $PACKAGE_SOURCE"
+            dotnet nuget push "$package" \
+              --api-key "$api_key" \
+              --source "$PACKAGE_SOURCE" \
+              --skip-duplicate
+          done

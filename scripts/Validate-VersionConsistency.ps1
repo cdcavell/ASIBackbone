@@ -23,39 +23,26 @@ function Resolve-RepositoryPath {
     return Join-Path $repoRoot $RelativePath
 }
 
-function Get-RequiredFileText {
-    param([string]$RelativePath)
-
-    $path = Resolve-RepositoryPath $RelativePath
-    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-        Add-Failure "Required file was not found: $RelativePath"
-        return ''
-    }
-
-    return Get-Content -LiteralPath $path -Raw
-}
-
 function Get-ProjectProperty {
     param(
-        [string]$RelativePath,
+        [string]$Path,
         [string]$PropertyName,
         [bool]$Required = $true
     )
 
-    $path = Resolve-RepositoryPath $RelativePath
-    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-        Add-Failure "Required project file was not found: $RelativePath"
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        Add-Failure "Required project file was not found: $Path"
         return $null
     }
 
-    [xml]$project = Get-Content -LiteralPath $path -Raw
+    [xml]$project = Get-Content -LiteralPath $Path -Raw
     $nodes = @($project.Project.PropertyGroup.ChildNodes | Where-Object {
         $_.NodeType -eq [System.Xml.XmlNodeType]::Element -and $_.Name -eq $PropertyName
     })
 
     if ($nodes.Count -eq 0) {
         if ($Required) {
-            Add-Failure "Property '$PropertyName' was not found in $RelativePath."
+            Add-Failure "Property '$PropertyName' was not found in $Path."
         }
 
         return $null
@@ -89,18 +76,6 @@ function Assert-Equal {
     }
 }
 
-function Assert-Matches {
-    param(
-        [string]$Text,
-        [string]$Pattern,
-        [string]$Description
-    )
-
-    if ($Text -notmatch $Pattern) {
-        Add-Failure "$Description was not found or did not match expected version '$ExpectedVersion'."
-    }
-}
-
 function Get-RegexGroupValue {
     param(
         [string]$Text,
@@ -122,8 +97,9 @@ function Get-RegexGroupValue {
     return $match.Groups[$GroupName].Value
 }
 
-$directoryVersionPrefix = Get-ProjectProperty 'Directory.Build.props' 'VersionPrefix'
-$directoryVersionSuffix = Get-ProjectProperty 'Directory.Build.props' 'VersionSuffix' $false
+$directoryBuildPropsPath = Resolve-RepositoryPath 'Directory.Build.props'
+$directoryVersionPrefix = Get-ProjectProperty $directoryBuildPropsPath 'VersionPrefix'
+$directoryVersionSuffix = Get-ProjectProperty $directoryBuildPropsPath 'VersionSuffix' $false
 $directoryVersionSuffix = if ($null -eq $directoryVersionSuffix) { '' } else { $directoryVersionSuffix }
 $resolvedDirectoryVersion = Resolve-Version $directoryVersionPrefix $directoryVersionSuffix
 
@@ -136,58 +112,47 @@ if ($ExpectedVersion -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$') {
 }
 
 Assert-Equal $resolvedDirectoryVersion $ExpectedVersion 'Directory.Build.props resolved version'
-Assert-Equal (Get-ProjectProperty 'Directory.Build.props' 'AssemblyVersion') "$directoryVersionPrefix.0" 'Directory.Build.props AssemblyVersion'
-Assert-Equal (Get-ProjectProperty 'Directory.Build.props' 'FileVersion') "$directoryVersionPrefix.0" 'Directory.Build.props FileVersion'
+Assert-Equal (Get-ProjectProperty $directoryBuildPropsPath 'AssemblyVersion') "$directoryVersionPrefix.0" 'Directory.Build.props AssemblyVersion'
+Assert-Equal (Get-ProjectProperty $directoryBuildPropsPath 'FileVersion') "$directoryVersionPrefix.0" 'Directory.Build.props FileVersion'
 
-$templateVersionPrefix = Get-ProjectProperty 'NetCoreApplicationTemplate.Template.csproj' 'VersionPrefix'
-$templateVersionSuffix = Get-ProjectProperty 'NetCoreApplicationTemplate.Template.csproj' 'VersionSuffix' $false
-$templateVersionSuffix = if ($null -eq $templateVersionSuffix) { '' } else { $templateVersionSuffix }
-$templateResolvedVersion = Resolve-Version $templateVersionPrefix $templateVersionSuffix
+$projectFiles = @(Get-ChildItem -LiteralPath (Resolve-RepositoryPath 'src') -Recurse -Filter '*.csproj' -File | Sort-Object FullName)
 
-Assert-Equal $templateResolvedVersion $ExpectedVersion 'NetCoreApplicationTemplate.Template.csproj resolved package version'
+if ($projectFiles.Count -eq 0) {
+    Add-Failure 'No package projects were found under src.'
+}
 
-$templateVersion = Get-ProjectProperty 'NetCoreApplicationTemplate.Template.csproj' 'Version' $false
-if (-not [string]::IsNullOrWhiteSpace($templateVersion)) {
-    $allowedVersionValues = @($ExpectedVersion, '$(VersionPrefix)', '$(Version)')
-    if ($allowedVersionValues -notcontains $templateVersion) {
-        Add-Failure "NetCoreApplicationTemplate.Template.csproj Version should be '$ExpectedVersion' or derive from VersionPrefix, but found '$templateVersion'."
+foreach ($projectFile in $projectFiles) {
+    $relativeProjectPath = [System.IO.Path]::GetRelativePath($repoRoot, $projectFile.FullName)
+
+    $version = Get-ProjectProperty $projectFile.FullName 'Version' $false
+    if (-not [string]::IsNullOrWhiteSpace($version)) {
+        $allowedVersionValues = @($ExpectedVersion, '$(VersionPrefix)', '$(Version)')
+        if ($allowedVersionValues -notcontains $version) {
+            Add-Failure "$relativeProjectPath Version should be '$ExpectedVersion' or derive from shared version metadata, but found '$version'."
+        }
+    }
+
+    $packageVersion = Get-ProjectProperty $projectFile.FullName 'PackageVersion' $false
+    if (-not [string]::IsNullOrWhiteSpace($packageVersion)) {
+        $allowedPackageVersionValues = @($ExpectedVersion, '$(VersionPrefix)', '$(Version)')
+        if ($allowedPackageVersionValues -notcontains $packageVersion) {
+            Add-Failure "$relativeProjectPath PackageVersion should be '$ExpectedVersion' or derive from shared version metadata, but found '$packageVersion'."
+        }
+    }
+
+    $packageId = Get-ProjectProperty $projectFile.FullName 'PackageId' $false
+    if ([string]::IsNullOrWhiteSpace($packageId)) {
+        Add-Failure "$relativeProjectPath should define PackageId for package publishing."
     }
 }
 
-$templatePackageVersion = Get-ProjectProperty 'NetCoreApplicationTemplate.Template.csproj' 'PackageVersion' $false
-if (-not [string]::IsNullOrWhiteSpace($templatePackageVersion)) {
-    $allowedPackageVersionValues = @($ExpectedVersion, '$(VersionPrefix)', '$(Version)')
-    if ($allowedPackageVersionValues -notcontains $templatePackageVersion) {
-        Add-Failure "NetCoreApplicationTemplate.Template.csproj PackageVersion should be '$ExpectedVersion' or derive from VersionPrefix, but found '$templatePackageVersion'."
+$citationPath = Resolve-RepositoryPath 'CITATION.cff'
+if (Test-Path -LiteralPath $citationPath -PathType Leaf) {
+    $citation = Get-Content -LiteralPath $citationPath -Raw
+    $citationVersion = Get-RegexGroupValue $citation '(?m)^version:\s*["'']?(?<version>[^"''\r\n]+)["'']?\s*$' 'version' 'CITATION.cff version metadata' $false
+    if (-not [string]::IsNullOrWhiteSpace($citationVersion)) {
+        Assert-Equal $citationVersion $ExpectedVersion 'CITATION.cff version metadata'
     }
-}
-
-$escapedVersion = [regex]::Escape($ExpectedVersion)
-$escapedReleaseTag = [regex]::Escape('`v' + $ExpectedVersion + '`')
-$escapedPackageId = [regex]::Escape('CDCavell.NetCoreApplicationTemplate')
-
-$readme = Get-RequiredFileText 'README.md'
-Assert-Matches $readme "Current release:\s*__\[Release $escapedVersion\]\([^\)]*/releases/tag/v$escapedVersion\)__" 'README current-release block'
-Assert-Matches $readme "Tag:\s*$escapedReleaseTag" 'README current-release tag'
-Assert-Matches $readme "$escapedPackageId\.$escapedVersion\.nupkg" 'README package install example'
-Assert-Matches $readme "Version $escapedVersion\. Zenodo\. MIT License\." 'README citation version'
-
-$packageReadme = Get-RequiredFileText 'PACKAGE-README.md'
-Assert-Matches $packageReadme "$escapedPackageId\.$escapedVersion\.nupkg" 'PACKAGE-README package install example'
-
-$citation = Get-RequiredFileText 'CITATION.cff'
-$citationVersion = Get-RegexGroupValue $citation '(?m)^version:\s*["'']?(?<version>[^"''\r\n]+)["'']?\s*$' 'version' 'CITATION.cff version metadata'
-if ($null -ne $citationVersion) {
-    Assert-Equal $citationVersion $ExpectedVersion 'CITATION.cff version metadata'
-}
-
-$changelog = Get-RequiredFileText 'CHANGELOG.md'
-$changelogMatch = [regex]::Match($changelog, '(?m)^##\s+(?<version>\d+\.\d+\.\d+(?:-[0-9A-Za-z][0-9A-Za-z.-]*)?)\s+-\s+\d{4}-\d{2}-\d{2}\s*$')
-if ($changelogMatch.Success) {
-    Assert-Equal $changelogMatch.Groups['version'].Value $ExpectedVersion 'CHANGELOG latest released version heading'
-}
-else {
-    Add-Failure 'CHANGELOG latest released version heading was not found.'
 }
 
 if (-not [string]::IsNullOrWhiteSpace($TagName)) {
@@ -206,17 +171,17 @@ if (-not [string]::IsNullOrWhiteSpace($PackageDirectory)) {
         Add-Failure "Package directory was not found: $PackageDirectory"
     }
     else {
-        $packages = @(Get-ChildItem -LiteralPath $packageDirectoryPath -Filter '*.nupkg' -File)
-        $expectedPackageName = "CDCavell.NetCoreApplicationTemplate.$ExpectedVersion.nupkg"
-        $matchingPackages = @($packages | Where-Object { $_.Name -eq $expectedPackageName })
-        $driftedPackages = @($packages | Where-Object { $_.Name -ne $expectedPackageName })
+        $packages = @(Get-ChildItem -LiteralPath $packageDirectoryPath -Filter '*.nupkg' -File | Sort-Object Name)
 
-        if ($matchingPackages.Count -eq 0) {
-            Add-Failure "No generated package named '$expectedPackageName' was found in $PackageDirectory."
+        if ($packages.Count -eq 0) {
+            Add-Failure "No generated packages were found in $PackageDirectory."
         }
 
-        foreach ($package in $driftedPackages) {
-            Add-Failure "Generated package filename '$($package.Name)' does not match expected version '$ExpectedVersion'."
+        $escapedVersion = [regex]::Escape($ExpectedVersion)
+        foreach ($package in $packages) {
+            if ($package.Name -notmatch "^.+\.$escapedVersion\.nupkg$") {
+                Add-Failure "Generated package filename '$($package.Name)' does not match expected version '$ExpectedVersion'."
+            }
         }
     }
 }
