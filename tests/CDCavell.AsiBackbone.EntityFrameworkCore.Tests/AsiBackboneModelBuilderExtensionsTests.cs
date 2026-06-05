@@ -36,7 +36,9 @@ public sealed class AsiBackboneModelBuilderExtensionsTests
     public void ApplyAsiBackboneConfigurationsCanBeCalledFromHostOwnedDbContext()
     {
         DbContextOptions<HostOwnedDbContext> options =
-            new DbContextOptionsBuilder<HostOwnedDbContext>().Options;
+            new DbContextOptionsBuilder<HostOwnedDbContext>()
+                .UseInMemoryDatabase($"asi-backbone-{Guid.NewGuid():N}")
+                .Options;
 
         using HostOwnedDbContext context = new(options);
 
