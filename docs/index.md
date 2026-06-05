@@ -15,6 +15,9 @@ ASIBackbone is a .NET governance and policy-control framework inspired by the AS
 * [Core Domain Language](articles/core-domain-language.md)
   Initial terminology and `0.1.0-alpha.1` Core boundary for governance spine, constraints, collapse boundary, actor context, decision results, audit residue, acknowledgment, capability tokens, and gateway boundaries.
 
+* [Equations and Toy Models](articles/equations-and-toy-models.md)
+  Explains the conceptual progression from `Λ(t)` to `Λ(τ)` to `ΛS(x, τ)` and maps the Eden/ASI collapse notation into practical ASIBackbone software terms: active policy structure, allowed decision states, acknowledgment, audit residue, and gateway-safe execution.
+
 * [Alpha Package Boundary](articles/alpha-package-boundary.md)
   Focused release-boundary guidance for `CDCavell.ASIBackbone.Core` before integration packages are added.
 
@@ -47,24 +50,6 @@ This page should summarize the ASI Backbone concept in plain technical language:
 * Auditability and responsibility trails
 * Gateway patterns for external systems
 * Clear boundary that this project is not an ASI implementation
-
-### Equations and toy models
-
-Planned article: `articles/equations-and-toy-models.md`
-
-This page should explain the conceptual equations and toy models that inspired the software architecture.
-
-Suggested sections:
-
-* Original collapse accumulator: `Λ(t)`
-* Relational-time reading: `Λ(τ)`
-* Structure-conditioned collapse: `ΛS(x, τ)`
-* Active constraint structure: `Sτ`
-* Allowed-state set: `A(Sτ)`
-* Decision outcomes as allowed software states
-* Toy model examples for policy narrowing, acknowledgment, and gateway enforcement
-
-The software interpretation is straightforward: a request does not become any possible action whatsoever. It becomes only what the active policy structure allows.
 
 ### Dynamic Liability Handshake
 
