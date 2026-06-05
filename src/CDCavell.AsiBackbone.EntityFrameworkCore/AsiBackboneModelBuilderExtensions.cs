@@ -16,7 +16,7 @@ public static class AsiBackboneModelBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(modelBuilder);
 
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AsiBackboneModelBuilderExtensions).Assembly);
+        _ = modelBuilder.ApplyConfigurationsFromAssembly(typeof(AsiBackboneModelBuilderExtensions).Assembly);
 
         return modelBuilder;
     }
