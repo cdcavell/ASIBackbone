@@ -1,4 +1,3 @@
-using CDCavell.AsiBackbone.EntityFrameworkCore;
 using Xunit;
 
 namespace CDCavell.AsiBackbone.EntityFrameworkCore.Tests;
