@@ -28,4 +28,43 @@ public sealed class AsiBackboneModelBuilderExtensionsTests
 
         _ = Assert.Throws<ArgumentNullException>(() => modelBuilder!.ApplyAsiBackboneConfigurations());
     }
+
+    /// <summary>
+    /// Verifies that ApplyAsiBackboneConfigurations can be called from a host-owned DbContext and applies configurations correctly.
+    /// </summary>
+    [Fact]
+    public void ApplyAsiBackboneConfigurationsCanBeCalledFromHostOwnedDbContext()
+    {
+        DbContextOptions<HostOwnedDbContext> options =
+            new DbContextOptionsBuilder<HostOwnedDbContext>().Options;
+
+        using HostOwnedDbContext context = new(options);
+
+        _ = context.Model;
+
+        Assert.True(context.AsiBackboneConfigurationsApplied);
+        Assert.NotNull(context.Model.FindEntityType(typeof(HostOwnedEntity)));
+    }
+
+    private sealed class HostOwnedDbContext(DbContextOptions<HostOwnedDbContext> options)
+        : DbContext(options)
+    {
+        public bool AsiBackboneConfigurationsApplied { get; private set; }
+
+        public DbSet<HostOwnedEntity> HostOwnedEntities => Set<HostOwnedEntity>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            ModelBuilder result = modelBuilder.ApplyAsiBackboneConfigurations();
+
+            AsiBackboneConfigurationsApplied = ReferenceEquals(modelBuilder, result);
+        }
+    }
+
+    private sealed class HostOwnedEntity
+    {
+        public int Id { get; set; }
+    }
 }

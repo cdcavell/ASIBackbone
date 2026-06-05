@@ -51,6 +51,9 @@ The host application owns the `DbContext`.
 A consuming application should be able to integrate AsiBackbone persistence using a pattern similar to:
 
 ```csharp
+using CDCavell.AsiBackbone.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
 public sealed class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -88,7 +91,7 @@ AsiBackbone EF Core package
 The preferred extension method should live in the EF Core integration package, likely under a namespace such as:
 
 ```csharp
-namespace CDCavell.AsiBackbone.Storage.EntityFrameworkCore;
+namespace CDCavell.AsiBackbone.EntityFrameworkCore;
 ```
 
 A future extension may look like:
