@@ -40,6 +40,7 @@ Those concerns belong in future integration packages or host applications.
 The initial Core language is documented in:
 
 * [Core Domain Language and Alpha Boundary](docs/articles/core-domain-language.md)
+* [Equations and Toy Models](docs/articles/equations-and-toy-models.md)
 * [Alpha Package Boundary](docs/articles/alpha-package-boundary.md)
 
 The central technical lane is:
