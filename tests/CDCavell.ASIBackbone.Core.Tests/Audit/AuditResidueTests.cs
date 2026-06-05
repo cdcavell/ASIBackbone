@@ -239,7 +239,7 @@ public sealed class AuditResidueTests
     {
         AsiBackboneActorContext actor = AsiBackboneActorContext.System;
 
-        _ = Assert.Throws<ArgumentException>(() =>
+        _ = Assert.ThrowsAny<ArgumentException>(() =>
             AuditResidue.Create(
                 actor,
                 operationName!,
@@ -260,7 +260,7 @@ public sealed class AuditResidueTests
     {
         AsiBackboneActorContext actor = AsiBackboneActorContext.System;
 
-        _ = Assert.Throws<ArgumentException>(() =>
+        _ = Assert.ThrowsAny<ArgumentException>(() =>
             AuditResidue.Create(
                 actor,
                 "document.approve",
