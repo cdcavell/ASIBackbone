@@ -287,4 +287,98 @@ public sealed class GovernanceDecisionTests
         Assert.Equal("decision.warning", reason.Code);
         Assert.Equal("Decision produced a warning.", reason.Message);
     }
+
+    /// <summary>
+    /// Verifies that the Deny factory method filters null reason entries while preserving valid reasons.
+    /// </summary>
+    [Fact]
+    public void DenyWithReasonsContainingNullFiltersNullReasons()
+    {
+        OperationReason[] reasons =
+        [
+            OperationReason.Create("policy.first", "First policy failure."),
+            null!,
+            OperationReason.Create("policy.second", "Second policy failure.")
+        ];
+
+        var decision = GovernanceDecision.Deny(reasons);
+
+        Assert.True(decision.IsDenied);
+        Assert.Equal(2, decision.Reasons.Count);
+        Assert.Equal(["policy.first", "policy.second"], decision.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Verifies that the Warning factory method filters null reason entries while preserving valid reasons.
+    /// </summary>
+    [Fact]
+    public void WarningWithReasonsContainingNullFiltersNullReasons()
+    {
+        OperationReason[] reasons =
+        [
+            OperationReason.Create("policy.warning", "Policy warning."),
+            null!,
+            OperationReason.Create("risk.warning", "Risk warning.")
+        ];
+
+        var decision = GovernanceDecision.Warning(reasons);
+
+        Assert.True(decision.IsWarning);
+        Assert.Equal(2, decision.Reasons.Count);
+        Assert.Equal(["policy.warning", "risk.warning"], decision.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Verifies that the Deny factory method falls back to the default denied reason when all provided reasons are null.
+    /// </summary>
+    [Fact]
+    public void DenyWithOnlyNullReasonsUsesDefaultDeniedReason()
+    {
+        OperationReason[] reasons = [null!];
+
+        var decision = GovernanceDecision.Deny(reasons);
+
+        Assert.True(decision.IsDenied);
+
+        OperationReason reason = Assert.Single(decision.Reasons);
+        Assert.Equal("decision.denied", reason.Code);
+        Assert.Equal("Decision denied the operation.", reason.Message);
+    }
+
+    /// <summary>
+    /// Verifies that the Warning factory method falls back to the default warning reason when all provided reasons are null.
+    /// </summary>
+    [Fact]
+    public void WarningWithOnlyNullReasonsUsesDefaultWarningReason()
+    {
+        OperationReason[] reasons = [null!];
+
+        var decision = GovernanceDecision.Warning(reasons);
+
+        Assert.True(decision.IsWarning);
+
+        OperationReason reason = Assert.Single(decision.Reasons);
+        Assert.Equal("decision.warning", reason.Code);
+        Assert.Equal("Decision produced a warning.", reason.Message);
+    }
+
+    /// <summary>
+    /// Verifies that the Deny factory method throws when the single reason overload receives null.
+    /// </summary>
+    [Fact]
+    public void DenyWithNullReasonThrows()
+    {
+        _ = Assert.Throws<ArgumentNullException>(() =>
+            GovernanceDecision.Deny((OperationReason)null!));
+    }
+
+    /// <summary>
+    /// Verifies that the Warning factory method throws when the single reason overload receives null.
+    /// </summary>
+    [Fact]
+    public void WarningWithNullReasonThrows()
+    {
+        _ = Assert.Throws<ArgumentNullException>(() =>
+            GovernanceDecision.Warning((OperationReason)null!));
+    }
 }
