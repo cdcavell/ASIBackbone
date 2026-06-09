@@ -186,7 +186,7 @@ public sealed class PolicyEvaluatorEndToEndTests
         DocumentApprovalContext context,
         GovernanceDecision decision)
     {
-        AuditResidue residue = AuditResidue.Create(
+        var residue = AuditResidue.Create(
             actor: context.Actor,
             operationName: context.OperationName,
             outcome: decision.Outcome.ToString(),
@@ -348,6 +348,18 @@ public sealed class PolicyEvaluatorEndToEndTests
                 DocumentRisk.PendingPolicy => GovernanceDecision.Defer(
                     "decision.policy_unavailable",
                     "Required policy data is not available yet.",
+                    correlationId: context.CorrelationId,
+                    policyVersion: context.PolicyVersion,
+                    policyHash: context.PolicyHash),
+                DocumentRisk.Low => GovernanceDecision.Warning(
+                    "decision.low_risk",
+                    "The document approval request has low risk.",
+                    correlationId: context.CorrelationId,
+                    policyVersion: context.PolicyVersion,
+                    policyHash: context.PolicyHash),
+                DocumentRisk.Elevated => GovernanceDecision.Warning(
+                    "decision.elevated_risk",
+                    "The document approval request has elevated risk.",
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash),
