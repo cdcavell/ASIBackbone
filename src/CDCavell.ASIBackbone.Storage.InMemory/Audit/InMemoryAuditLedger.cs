@@ -33,15 +33,14 @@ public sealed class InMemoryAuditLedger : IAsiBackboneAuditSink
         IAsiBackboneAuditResidue residue,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(residue);
-        cancellationToken.ThrowIfCancellationRequested();
+        return WriteCore(residue, cancellationToken);
+    }
 
-        lock (syncRoot)
-        {
-            records.Add(residue);
-        }
-
-        return ValueTask.CompletedTask;
+    ValueTask IAsiBackboneAuditSink.WriteAsync(
+        IAsiBackboneAuditResidue residue,
+        CancellationToken cancellationToken)
+    {
+        return WriteCore(residue, cancellationToken);
     }
 
     /// <summary>
@@ -84,5 +83,20 @@ public sealed class InMemoryAuditLedger : IAsiBackboneAuditSink
                 normalizedEventId,
                 StringComparison.Ordinal));
         }
+    }
+
+    private ValueTask WriteCore(
+        IAsiBackboneAuditResidue residue,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(residue);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        lock (syncRoot)
+        {
+            records.Add(residue);
+        }
+
+        return ValueTask.CompletedTask;
     }
 }
