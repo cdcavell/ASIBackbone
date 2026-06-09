@@ -333,6 +333,8 @@ public sealed class PolicyEvaluatorEndToEndTests
 
             GovernanceDecision decision = context.Risk switch
             {
+                DocumentRisk.Low => composedDecision,
+                DocumentRisk.Elevated => composedDecision,
                 DocumentRisk.High => GovernanceDecision.RequireAcknowledgment(
                     "decision.acknowledgment_required",
                     "High-risk document approvals require acknowledgment before execution.",
@@ -348,18 +350,6 @@ public sealed class PolicyEvaluatorEndToEndTests
                 DocumentRisk.PendingPolicy => GovernanceDecision.Defer(
                     "decision.policy_unavailable",
                     "Required policy data is not available yet.",
-                    correlationId: context.CorrelationId,
-                    policyVersion: context.PolicyVersion,
-                    policyHash: context.PolicyHash),
-                DocumentRisk.Low => GovernanceDecision.Warning(
-                    "decision.low_risk",
-                    "The document approval request has low risk.",
-                    correlationId: context.CorrelationId,
-                    policyVersion: context.PolicyVersion,
-                    policyHash: context.PolicyHash),
-                DocumentRisk.Elevated => GovernanceDecision.Warning(
-                    "decision.elevated_risk",
-                    "The document approval request has elevated risk.",
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash),
