@@ -1,3 +1,4 @@
+using CDCavell.AsiBackbone.Core.Audit;
 using CDCavell.ASIBackbone.Core.Audit;
 
 namespace CDCavell.ASIBackbone.Storage.InMemory.Audit;
@@ -11,7 +12,7 @@ namespace CDCavell.ASIBackbone.Storage.InMemory.Audit;
 /// </remarks>
 public sealed class InMemoryAuditLedger : IAsiBackboneAuditSink
 {
-    private readonly object syncRoot = new();
+    private readonly Lock syncRoot = new();
     private readonly List<IAsiBackboneAuditResidue> records = [];
 
     /// <summary>
