@@ -7,11 +7,17 @@
 - name: Core Domain Language
   href: core-domain-language.md
 
+- name: Equations and Toy Models
+  href: equations-and-toy-models.md
+
 - name: Policy Evaluator Pipeline
   href: policy-evaluator-pipeline.md
 
 - name: Alpha Package Boundary
   href: alpha-package-boundary.md
+
+- name: EF Core Integration Boundary
+  href: ef-core-integration-boundary.md
 
 - name: Core Alpha Readiness Review
   href: core-alpha-readiness-review.md
