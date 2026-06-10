@@ -3,6 +3,7 @@ using CDCavell.AsiBackbone.Core.Handshakes;
 using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Xunit;
 
 namespace CDCavell.AsiBackbone.EntityFrameworkCore.Tests;
@@ -329,7 +330,7 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
             var connection = new SqliteConnection("Data Source=:memory:");
             await connection.OpenAsync(cancellationToken);
 
-            DbContextOptions<HostOwnedSqliteDbContext> options = new DbContextOptionsBuilder<HostOwnedSqliteDbContext>()
+            var options = new DbContextOptionsBuilder<HostOwnedSqliteDbContext>()
                 .UseSqlite(connection)
                 .Options;
 
@@ -355,6 +356,11 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
     private sealed class HostOwnedSqliteDbContext(DbContextOptions<HostOwnedSqliteDbContext> options)
         : DbContext(options)
     {
+        private static readonly ValueConverter<DateTimeOffset, long> DateTimeOffsetToTicksConverter =
+            new(
+                value => value.UtcDateTime.Ticks,
+                value => new DateTimeOffset(new DateTime(value, DateTimeKind.Utc)));
+
         public DbSet<AsiBackboneAuditLedgerRecordEntity> AuditLedgerRecords =>
             Set<AsiBackboneAuditLedgerRecordEntity>();
 
@@ -381,6 +387,22 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
             base.OnModelCreating(modelBuilder);
 
             _ = modelBuilder.ApplyAsiBackboneConfigurations();
+            ApplySqliteDateTimeOffsetConversions(modelBuilder);
+        }
+
+        private static void ApplySqliteDateTimeOffsetConversions(ModelBuilder modelBuilder)
+        {
+            _ = modelBuilder.Entity<AsiBackboneAuditLedgerRecordEntity>()
+                .Property(entity => entity.OccurredUtc)
+                .HasConversion(DateTimeOffsetToTicksConverter);
+
+            _ = modelBuilder.Entity<AsiBackboneAuditLedgerRecordEntity>()
+                .Property(entity => entity.RecordedUtc)
+                .HasConversion(DateTimeOffsetToTicksConverter);
+
+            _ = modelBuilder.Entity<AsiBackboneHandshakeAcknowledgmentEntity>()
+                .Property(entity => entity.OccurredUtc)
+                .HasConversion(DateTimeOffsetToTicksConverter);
         }
     }
 }
