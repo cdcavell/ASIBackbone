@@ -212,7 +212,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         };
     }
 
-    private static IReadOnlyList<AsiBackboneAuditLedgerReasonCodeEntity> ToReasonCodeEntities(
+    private static AsiBackboneAuditLedgerReasonCodeEntity[] ToReasonCodeEntities(
         Guid auditLedgerRecordId,
         IReadOnlyList<string> reasonCodes)
     {
@@ -226,7 +226,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             .ToArray();
     }
 
-    private static IReadOnlyList<AsiBackboneAuditLedgerMetadataEntity> ToMetadataEntities(
+    private static AsiBackboneAuditLedgerMetadataEntity[] ToMetadataEntities(
         Guid auditLedgerRecordId,
         IReadOnlyDictionary<string, string> metadata)
     {
@@ -240,15 +240,15 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             .ToArray();
     }
 
-    private static IReadOnlyList<AuditLedgerRecord> ToRecords(IEnumerable<AsiBackboneAuditLedgerRecordEntity> entities)
+    private static AuditLedgerRecord[] ToRecords(IEnumerable<AsiBackboneAuditLedgerRecordEntity> entities)
     {
-        return Array.AsReadOnly([.. entities.Select(ToRecord)]);
+        return [.. entities.Select(ToRecord)];
     }
 
     private static AuditLedgerRecord ToRecord(AsiBackboneAuditLedgerRecordEntity entity)
     {
         string[] reasonCodes = DeserializeReasonCodes(entity.ReasonCodesJson);
-        IReadOnlyDictionary<string, string> metadata = DeserializeMetadata(entity.MetadataJson);
+        ReadOnlyDictionary<string, string> metadata = DeserializeMetadata(entity.MetadataJson);
 
         var residue = new EntityAuditResidue(
             entity.EventId,
@@ -286,7 +286,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             : JsonSerializer.Deserialize<string[]>(json, JsonOptions) ?? [];
     }
 
-    private static IReadOnlyDictionary<string, string> DeserializeMetadata(string? json)
+    private static ReadOnlyDictionary<string, string> DeserializeMetadata(string? json)
     {
         if (string.IsNullOrWhiteSpace(json))
         {
