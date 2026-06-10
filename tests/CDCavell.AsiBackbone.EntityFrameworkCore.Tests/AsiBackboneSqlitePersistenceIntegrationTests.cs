@@ -77,7 +77,7 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
             SignatureKeyId = "signing-key-1",
             SignatureAlgorithm = "HS256",
             SignatureValue = "signature-value",
-            MetadataJson = "{\"tenant\":\"sample\",\"source\":\"integration-test\"}"
+            MetadataJson = /*lang=json,strict*/ "{\"tenant\":\"sample\",\"source\":\"integration-test\"}"
         };
 
         _ = context.AuditLedgerRecords.Add(record);
@@ -329,7 +329,7 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
             var connection = new SqliteConnection("Data Source=:memory:");
             await connection.OpenAsync(cancellationToken);
 
-            var options = new DbContextOptionsBuilder<HostOwnedSqliteDbContext>()
+            DbContextOptions<HostOwnedSqliteDbContext> options = new DbContextOptionsBuilder<HostOwnedSqliteDbContext>()
                 .UseSqlite(connection)
                 .Options;
 
