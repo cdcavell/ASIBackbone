@@ -60,7 +60,9 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
             "correlation-123",
             TestContext.Current.CancellationToken);
 
-        Assert.Equal([firstRecord, secondRecord], found);
+        AuditLedgerRecord[] expected = [firstRecord, secondRecord];
+
+        Assert.Equal(expected, found);
     }
 
     /// <summary>
@@ -83,7 +85,9 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
             "trace-123",
             TestContext.Current.CancellationToken);
 
-        Assert.Equal([firstRecord, secondRecord], found);
+        AuditLedgerRecord[] expected = [firstRecord, secondRecord];
+
+        Assert.Equal(expected, found);
     }
 
     /// <summary>
@@ -106,7 +110,9 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
             "actor-123",
             TestContext.Current.CancellationToken);
 
-        Assert.Equal([firstRecord, secondRecord], found);
+        AuditLedgerRecord[] expected = [firstRecord, secondRecord];
+
+        Assert.Equal(expected, found);
     }
 
     /// <summary>
@@ -145,7 +151,9 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
             new DateTimeOffset(2026, 6, 2, 12, 0, 0, TimeSpan.Zero),
             TestContext.Current.CancellationToken);
 
-        Assert.Equal([secondRecord], found);
+        AuditLedgerRecord[] expected = [secondRecord];
+
+        Assert.Equal(expected, found);
     }
 
     private static AuditLedgerRecord CreateRecord(
@@ -155,7 +163,7 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
         string actorId,
         DateTimeOffset? recordedUtc = null)
     {
-        var actor = new AsiBackboneActorContext(actorId, AsiBackboneActorType.User, null);
+        AsiBackboneActorContext actor = AsiBackboneActorContext.Human(actorId);
         var residue = AuditResidue.Create(
             actor,
             "system.sync",
