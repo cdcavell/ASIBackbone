@@ -1,8 +1,8 @@
 # EF Core Integration Package Boundary
 
-This article defines the intended boundary for the future `CDCavell.AsiBackbone.Storage.EntityFrameworkCore` package.
+This article defines the intended boundary for the implemented `CDCavell.AsiBackbone.EntityFrameworkCore` package.
 
-The EF Core integration package should provide persistence configuration and storage helpers for AsiBackbone accountability records while preserving host ownership of the application database.
+The EF Core integration package provides persistence configuration and storage helpers for AsiBackbone accountability records while preserving host ownership of the application database.
 
 > [!IMPORTANT]
 > AsiBackbone should not own the host application's `DbContext`, database provider, connection string, migrations, deployment process, or schema lifecycle. The host application remains responsible for those concerns.
@@ -20,16 +20,16 @@ It should not answer:
 > Which migration strategy must the host adopt?
 > Which application template must the host use?
 
-The package should contribute EF Core model configuration, persistence-facing entities or records, and storage contracts/implementations where appropriate. The host application should remain the composition root.
+The package contributes EF Core model configuration, persistence-facing entities, and storage implementations where appropriate. The host application remains the composition root.
 
 ## Package responsibility
 
-`CDCavell.AsiBackbone.Storage.EntityFrameworkCore` may provide:
+`CDCavell.AsiBackbone.EntityFrameworkCore` provides:
 
 * EF Core entity type configurations for AsiBackbone persistence models
 * `ModelBuilder` extension methods for applying AsiBackbone configurations
 * EF Core-backed implementations of Core storage contracts
-* persistence models for audit records, decision receipts, handshake records, reason codes, metadata, and policy trace fields
+* persistence models for audit records, handshake records, reason codes, metadata, and policy trace fields
 * provider-neutral EF Core configuration where practical
 * integration tests proving the package works inside a host-owned `DbContext`
 
@@ -88,13 +88,13 @@ AsiBackbone EF Core package
 
 ## ModelBuilder extension location
 
-The preferred extension method should live in the EF Core integration package, likely under a namespace such as:
+The extension method lives in the EF Core integration package under:
 
 ```csharp
 namespace CDCavell.AsiBackbone.EntityFrameworkCore;
 ```
 
-A future extension may look like:
+The public contract is intentionally simple: the host calls one extension method from `OnModelCreating`.
 
 ```csharp
 public static class AsiBackboneModelBuilderExtensions
@@ -110,13 +110,11 @@ public static class AsiBackboneModelBuilderExtensions
 }
 ```
 
-The exact implementation may change, but the public contract should remain simple: the host calls one extension method from `OnModelCreating`.
-
 ## Migration ownership
 
 Migrations belong to the host application.
 
-The EF Core integration package should not ship required migrations for the host database. This avoids forcing the package to choose a database provider, schema naming convention, migration assembly, deployment model, or operational process.
+The EF Core integration package does not ship required migrations for the host database. This avoids forcing the package to choose a database provider, schema naming convention, migration assembly, deployment model, or operational process.
 
 The host application should decide:
 
@@ -134,7 +132,7 @@ AsiBackbone can document recommended schema shapes, but the host should own the 
 
 ## Provider-neutral design
 
-The initial EF Core integration should favor provider-neutral configuration.
+The initial EF Core integration favors provider-neutral configuration.
 
 Provider-specific features should be avoided unless there is a clear extension point. For example, the first milestone should avoid relying on SQL Server-specific, PostgreSQL-specific, or SQLite-specific behavior in the package core.
 
@@ -142,15 +140,15 @@ Provider-specific examples may appear later in samples or documentation, but the
 
 ## Relationship to Core
 
-`CDCavell.AsiBackbone.Core` should remain free of EF Core references.
+`CDCavell.AsiBackbone.Core` remains free of EF Core references.
 
-Dependency direction should be:
+Dependency direction is:
 
 ```text
 CDCavell.AsiBackbone.Core
         ▲
         │
-CDCavell.AsiBackbone.Storage.EntityFrameworkCore
+CDCavell.AsiBackbone.EntityFrameworkCore
 ```
 
 Core defines the domain contracts and governance primitives. The EF Core package adapts those contracts into persistence behavior.
@@ -187,12 +185,11 @@ The host application still owns the DbContext, provider, migrations, schema life
 
 ## Initial persistence focus
 
-The first EF Core milestone should focus on accountability records, not broad application persistence.
+The first EF Core milestone focuses on accountability records, not broad application persistence.
 
-Candidate persistence areas include:
+Implemented persistence areas include:
 
-* audit residue or audit receipts
-* governance decision receipts
+* audit ledger records
 * liability/responsibility handshake requests
 * liability/responsibility handshake acknowledgments
 * reason codes
@@ -205,7 +202,7 @@ This aligns persistence with the AsiBackbone governance spine: decisions, acknow
 
 ## Non-goals for the first EF Core milestone
 
-The first EF Core integration should not include:
+The first EF Core integration does not include:
 
 * a package-owned application `DbContext`
 * package-owned migrations
