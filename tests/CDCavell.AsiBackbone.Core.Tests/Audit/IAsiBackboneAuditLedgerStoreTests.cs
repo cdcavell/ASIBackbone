@@ -163,7 +163,7 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
         string actorId,
         DateTimeOffset? recordedUtc = null)
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.Human(actorId);
+        var actor = AsiBackboneActorContext.Human(actorId);
         var residue = AuditResidue.Create(
             actor,
             "system.sync",

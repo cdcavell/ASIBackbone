@@ -142,7 +142,7 @@ public sealed class EfCoreAuditLedgerStoreTests
         IEnumerable<string>? reasonCodes = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        AsiBackboneActorContext actor = AsiBackboneActorContext.Human(actorId, "Test Actor");
+        var actor = AsiBackboneActorContext.Human(actorId, "Test Actor");
         var residue = AuditResidue.Create(
             actor,
             "system.sync",
