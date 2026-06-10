@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <PackageId>CDCavell.AsiBackbone.Storage.InMemory</PackageId>
     <Title>CDCavell ASI Backbone In-Memory Storage</Title>
-    <Description>In-memory storage helpers for local AsiBackbone testing and samples.</Description>
+    <Description>Non-durable in-memory storage helpers for ASI Backbone local validation, tests, and samples.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <ItemGroup>
