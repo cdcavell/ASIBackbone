@@ -330,7 +330,7 @@ public sealed class AsiBackboneSqlitePersistenceIntegrationTests
             var connection = new SqliteConnection("Data Source=:memory:");
             await connection.OpenAsync(cancellationToken);
 
-            var options = new DbContextOptionsBuilder<HostOwnedSqliteDbContext>()
+            DbContextOptions<HostOwnedSqliteDbContext> options = new DbContextOptionsBuilder<HostOwnedSqliteDbContext>()
                 .UseSqlite(connection)
                 .Options;
 
