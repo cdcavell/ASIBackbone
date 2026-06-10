@@ -1,4 +1,6 @@
+using CDCavell.AsiBackbone.AspNetCore.Actors;
 using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit;
@@ -20,6 +22,25 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.True(options.IncludeRouteValues);
         Assert.True(options.IncludeEndpointMetadata);
         Assert.Equal("X-Correlation-ID", options.CorrelationIdHeaderName);
+    }
+
+    [Fact]
+    public void AddAsiBackboneAspNetCoreRegistersActorContextServices()
+    {
+        ServiceCollection services = new();
+
+        _ = services.AddAsiBackboneAspNetCore();
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        using IServiceScope scope = provider.CreateScope();
+
+        _ = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+        _ = scope.ServiceProvider.GetRequiredService<IAsiBackboneHttpActorContextResolver>();
+        AsiBackboneHttpActorContextOptions options = scope.ServiceProvider.GetRequiredService<IOptions<AsiBackboneHttpActorContextOptions>>().Value;
+
+        Assert.Contains("sub", options.ActorIdClaimTypes);
+        Assert.Contains("name", options.DisplayNameClaimTypes);
+        Assert.Equal("actor_type", options.ActorTypeClaimType);
     }
 
     [Fact]
