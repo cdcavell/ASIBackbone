@@ -19,5 +19,8 @@
 - name: EF Core Integration Boundary
   href: ef-core-integration-boundary.md
 
+- name: EF Core Host Ownership and Migrations
+  href: ef-core-host-ownership-and-migrations.md
+
 - name: Core Alpha Readiness Review
   href: core-alpha-readiness-review.md
