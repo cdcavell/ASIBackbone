@@ -10,7 +10,6 @@ namespace CDCavell.AsiBackbone.AspNetCore.Handshakes;
 /// </summary>
 public sealed class DefaultAsiBackboneAcknowledgmentChallengeService : IAsiBackboneAcknowledgmentChallengeService
 {
-    private const string ChallengeNotRequiredCode = "acknowledgment.challenge.not_required";
     private const string ChallengeMismatchCode = "acknowledgment.challenge.mismatch";
     private const string ChallengeCodeMismatchCode = "acknowledgment.challenge.code_mismatch";
 
@@ -41,7 +40,7 @@ public sealed class DefaultAsiBackboneAcknowledgmentChallengeService : IAsiBackb
             throw new InvalidOperationException("Only acknowledgment-required governance decisions can be converted into acknowledgment challenges.");
         }
 
-        LiabilityHandshakeRequest request = LiabilityHandshakeRequest.FromDecision(
+        var request = LiabilityHandshakeRequest.FromDecision(
             actor,
             operationName,
             decision,
@@ -79,7 +78,7 @@ public sealed class DefaultAsiBackboneAcknowledgmentChallengeService : IAsiBackb
                 "The acknowledgment response did not contain the required acknowledgment code.");
         }
 
-        LiabilityHandshakeAcknowledgment acknowledgment = LiabilityHandshakeAcknowledgment.Create(
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Create(
             challenge.HandshakeRequest,
             actor,
             response.Acknowledged,
