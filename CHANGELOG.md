@@ -4,6 +4,55 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0-alpha.1] - 2026-06-11
+
+### Samples and Host Validation
+
+### Added
+
+* Added `samples/PlainAspNetCoreHost` as the canonical in-repository ASP.NET Core validation sample.
+* Added a plain ASP.NET Core sample project demonstrating:
+
+  * `AddAsiBackboneAspNetCore()` registration.
+  * host-defined constraint evaluation.
+  * host-defined decision policy behavior.
+  * acknowledgment-required decision flow.
+  * in-memory audit residue capture.
+  * EF Core audit ledger persistence through a host-owned `DbContext`.
+  * SQLite-based local validation.
+* Added sample documentation for the plain ASP.NET Core host.
+* Added DocFX article for the plain ASP.NET Core host sample.
+* Added DocFX article documenting `NetCoreApplicationTemplate` as an optional external local validation host.
+* Added package-reference and local project-reference guidance for validating AsiBackbone against a `NetCoreApplicationTemplate`-generated host.
+* Added host-owned EF Core integration guidance showing `ApplyAsiBackboneConfigurations()`.
+* Added temporary validation endpoint sketch for external host validation.
+* Added targeted branch coverage tests for:
+
+  * ASP.NET Core options.
+  * request correlation resolution.
+  * acknowledgment challenge handling.
+  * EF Core audit ledger edge paths.
+
+### Changed
+
+* Updated documentation navigation to include sample and host-validation guidance.
+* Updated README links to reference the new sample and host-validation documentation.
+* Clarified that the plain ASP.NET Core host sample is the canonical in-repository validation baseline.
+* Clarified that `NetCoreApplicationTemplate` is a preferred external validation host, not a required dependency or parent framework.
+
+### Validation
+
+* Confirmed the solution builds successfully in Release configuration.
+* Confirmed the full test suite passes in Release configuration.
+* Regenerated local coverage after targeted branch coverage additions.
+
+### Boundary Notes
+
+* No AsiBackbone project references `NetCoreApplicationTemplate`.
+* No in-repository `NetCoreApplicationTemplate` sample was added.
+* `NetCoreApplicationTemplate` remains optional and external.
+* AsiBackbone remains governance infrastructure, not an intelligence engine, AI model host, or ASI implementation.
+
 ## [0.3.0-alpha.1] - 2026-06-11
 
 ### Added
