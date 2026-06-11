@@ -1,6 +1,7 @@
 using CDCavell.AsiBackbone.AspNetCore.Correlation;
 using CDCavell.AsiBackbone.Core.Actors;
 using CDCavell.AsiBackbone.Core.Audit;
+using CDCavell.AsiBackbone.Core.Constraints;
 using CDCavell.AsiBackbone.Core.Decisions;
 using Xunit;
 
@@ -14,7 +15,7 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
         AsiBackboneHttpRequestCorrelation correlation = new(
             correlationId: "request-correlation",
             traceId: "request-trace");
-        GovernanceDecision decision = GovernanceDecision.Allow(
+        var decision = GovernanceDecision.Allow(
             correlationId: "decision-correlation",
             traceId: "decision-trace",
             policyVersion: "v1",
@@ -35,7 +36,7 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
     public void CreateAuditResidueFallsBackToDecisionCorrelationWhenRequestCorrelationIsMissing()
     {
         AsiBackboneHttpRequestCorrelation correlation = new();
-        GovernanceDecision decision = GovernanceDecision.Allow(
+        var decision = GovernanceDecision.Allow(
             correlationId: "decision-correlation",
             traceId: "decision-trace");
 
@@ -57,7 +58,7 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
                 [AsiBackboneHttpRequestMetadataKeys.Method] = "POST",
                 [AsiBackboneHttpRequestMetadataKeys.RoutePattern] = "/api/widgets/{id}",
             });
-        GovernanceDecision decision = GovernanceDecision.Allow();
+        var decision = GovernanceDecision.Allow();
         Dictionary<string, string> metadata = new(StringComparer.Ordinal)
         {
             ["operation.scope"] = "test",
@@ -85,7 +86,7 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
                 [AsiBackboneHttpRequestMetadataKeys.Method] = "GET",
             });
 
-        var context = correlation.ToEvaluationContext(
+        AsiBackboneConstraintEvaluationContext context = correlation.ToEvaluationContext(
             policyVersion: "v2",
             policyHash: "hash-2",
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
