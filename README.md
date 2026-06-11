@@ -70,6 +70,8 @@ The initial Core language is documented in:
 * [Alpha Package Boundary](docs/articles/alpha-package-boundary.md)
 * [EF Core Integration Boundary](docs/articles/ef-core-integration-boundary.md)
 * [EF Core Host Ownership and Migration Guidance](docs/articles/ef-core-host-ownership-and-migrations.md)
+* [Plain ASP.NET Core Host Sample](docs/articles/plain-aspnetcore-host-sample.md)
+* [NetCoreApplicationTemplate Host Validation](docs/articles/netcoreapplicationtemplate-host-validation.md)
 
 The central technical lane is:
 
@@ -231,6 +233,8 @@ Planned future samples or validation hosts.
 
 Samples may include a console or worker host, a plain ASP.NET Core host, and a NetCoreApplicationTemplate-based host.
 
+The plain ASP.NET Core host sample is the canonical in-repository validation baseline. NetCoreApplicationTemplate is documented separately as an optional external local validation host for developers who want to test AsiBackbone against a fuller enterprise-style application baseline.
+
 ## CDCavell.AsiBackbone.Robotics
 
 Later integration package.
@@ -259,6 +263,8 @@ A consumer should be able to use AsiBackbone in:
 - an application generated from NetCoreApplicationTemplate
 - an existing ASP.NET Core application
 - a future custom host that provides the required infrastructure
+
+For validation guidance, see [NetCoreApplicationTemplate Host Validation](docs/articles/netcoreapplicationtemplate-host-validation.md).
 
 ## Alignment Boundary
 
