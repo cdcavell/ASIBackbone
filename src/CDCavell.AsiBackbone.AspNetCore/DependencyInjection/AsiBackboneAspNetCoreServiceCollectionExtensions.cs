@@ -1,4 +1,5 @@
 using CDCavell.AsiBackbone.AspNetCore.Actors;
+using CDCavell.AsiBackbone.AspNetCore.Correlation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
@@ -40,7 +41,18 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
 
         _ = services.AddOptions<AsiBackboneAspNetCoreOptions>()
             .Configure(configure)
-            .Validate(static options => !string.IsNullOrWhiteSpace(options.CorrelationIdHeaderName), "CorrelationIdHeaderName must be configured.")
+            .Validate(static options =>
+            {
+                try
+                {
+                    options.Validate();
+                    return true;
+                }
+                catch (InvalidOperationException)
+                {
+                    return false;
+                }
+            }, "ASP.NET Core integration options must be valid.")
             .ValidateOnStart();
 
         _ = services.AddOptions<AsiBackboneHttpActorContextOptions>()
@@ -60,6 +72,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
 
         _ = services.AddHttpContextAccessor();
         _ = services.AddScoped<IAsiBackboneHttpActorContextResolver, HttpContextAsiBackboneActorContextResolver>();
+        _ = services.AddScoped<IAsiBackboneHttpRequestCorrelationResolver, HttpContextAsiBackboneRequestCorrelationResolver>();
 
         return services;
     }
