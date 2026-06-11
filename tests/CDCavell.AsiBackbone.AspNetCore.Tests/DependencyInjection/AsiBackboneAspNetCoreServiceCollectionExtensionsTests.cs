@@ -1,4 +1,5 @@
 using CDCavell.AsiBackbone.AspNetCore.Actors;
+using CDCavell.AsiBackbone.AspNetCore.Correlation;
 using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +22,12 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
 
         Assert.True(options.IncludeRouteValues);
         Assert.True(options.IncludeEndpointMetadata);
+        Assert.True(options.IncludeRequestMethod);
+        Assert.False(options.IncludeRequestPath);
+        Assert.True(options.UseHttpContextTraceIdentifierAsCorrelationId);
         Assert.Equal("X-Correlation-ID", options.CorrelationIdHeaderName);
+        Assert.Contains("X-Request-ID", options.CorrelationIdHeaderNames);
+        Assert.Contains("Traceparent", options.CorrelationIdHeaderNames);
     }
 
     [Fact]
@@ -44,6 +50,19 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void AddAsiBackboneAspNetCoreRegistersRequestCorrelationServices()
+    {
+        ServiceCollection services = new();
+
+        _ = services.AddAsiBackboneAspNetCore();
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        using IServiceScope scope = provider.CreateScope();
+
+        _ = scope.ServiceProvider.GetRequiredService<IAsiBackboneHttpRequestCorrelationResolver>();
+    }
+
+    [Fact]
     public void AddAsiBackboneAspNetCoreAppliesConfiguredOptions()
     {
         ServiceCollection services = new();
@@ -52,6 +71,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         {
             options.IncludeRouteValues = false;
             options.IncludeEndpointMetadata = false;
+            options.IncludeRequestMethod = false;
+            options.IncludeRequestPath = true;
+            options.UseHttpContextTraceIdentifierAsCorrelationId = false;
             options.CorrelationIdHeaderName = "X-Request-ID";
         });
 
@@ -60,6 +82,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
 
         Assert.False(options.IncludeRouteValues);
         Assert.False(options.IncludeEndpointMetadata);
+        Assert.False(options.IncludeRequestMethod);
+        Assert.True(options.IncludeRequestPath);
+        Assert.False(options.UseHttpContextTraceIdentifierAsCorrelationId);
         Assert.Equal("X-Request-ID", options.CorrelationIdHeaderName);
     }
 
@@ -90,6 +115,6 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
             services.AddAsiBackboneAspNetCore(options => options.CorrelationIdHeaderName = headerName!));
 
-        Assert.Contains("CorrelationIdHeaderName", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("correlation identifier header name", exception.Message, StringComparison.Ordinal);
     }
 }
