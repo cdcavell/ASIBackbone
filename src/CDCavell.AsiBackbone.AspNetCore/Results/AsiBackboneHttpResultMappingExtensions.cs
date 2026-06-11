@@ -41,8 +41,8 @@ public static class AsiBackboneHttpResultMappingExtensions
         options.Validate();
 
         return decision.CanProceed
-            ? Results.Json(CreateDecisionBody(decision, options, allowed: true), statusCode: ResolveDecisionStatusCode(decision, options))
-            : Results.Problem(CreateDecisionProblemDetails(decision, options));
+            ? Microsoft.AspNetCore.Http.Results.Json(CreateDecisionBody(decision, options, allowed: true), statusCode: ResolveDecisionStatusCode(decision, options))
+            : Microsoft.AspNetCore.Http.Results.Problem(CreateDecisionProblemDetails(decision, options));
     }
 
     /// <summary>
@@ -68,8 +68,8 @@ public static class AsiBackboneHttpResultMappingExtensions
         options.Validate();
 
         return result.Succeeded
-            ? Results.Json(CreateOperationBody(result, options), statusCode: options.SuccessStatusCode)
-            : Results.Problem(CreateOperationProblemDetails(result, options));
+            ? Microsoft.AspNetCore.Http.Results.Json(CreateOperationBody(result, options), statusCode: options.SuccessStatusCode)
+            : Microsoft.AspNetCore.Http.Results.Problem(CreateOperationProblemDetails(result, options));
     }
 
     private static int ResolveDecisionStatusCode(GovernanceDecision decision, AsiBackboneHttpResultMappingOptions options)
@@ -82,7 +82,6 @@ public static class AsiBackboneHttpResultMappingExtensions
             GovernanceDecisionOutcome.Deferred => options.DeferredStatusCode,
             GovernanceDecisionOutcome.AcknowledgmentRequired => options.AcknowledgmentRequiredStatusCode,
             GovernanceDecisionOutcome.EscalationRecommended => options.EscalationRecommendedStatusCode,
-            _ => options.OperationFailureStatusCode,
         };
     }
 
@@ -121,7 +120,7 @@ public static class AsiBackboneHttpResultMappingExtensions
         return problemDetails;
     }
 
-    private static object CreateDecisionBody(
+    private static Dictionary<string, object?> CreateDecisionBody(
         GovernanceDecision decision,
         AsiBackboneHttpResultMappingOptions options,
         bool allowed)
@@ -137,7 +136,7 @@ public static class AsiBackboneHttpResultMappingExtensions
         return body;
     }
 
-    private static object CreateOperationBody(OperationResult result, AsiBackboneHttpResultMappingOptions options)
+    private static Dictionary<string, object?> CreateOperationBody(OperationResult result, AsiBackboneHttpResultMappingOptions options)
     {
         Dictionary<string, object?> body = new(StringComparer.Ordinal)
         {
@@ -153,11 +152,12 @@ public static class AsiBackboneHttpResultMappingExtensions
     {
         return outcome switch
         {
+            GovernanceDecisionOutcome.Allowed => "Governance decision allowed execution.",
+            GovernanceDecisionOutcome.Warning => "Governance decision allowed execution with warnings.",
             GovernanceDecisionOutcome.Denied => "Governance decision denied execution.",
             GovernanceDecisionOutcome.Deferred => "Governance decision deferred execution.",
             GovernanceDecisionOutcome.AcknowledgmentRequired => "Governance decision requires acknowledgment.",
             GovernanceDecisionOutcome.EscalationRecommended => "Governance decision recommends escalation.",
-            _ => "Governance decision did not allow immediate execution.",
         };
     }
 
