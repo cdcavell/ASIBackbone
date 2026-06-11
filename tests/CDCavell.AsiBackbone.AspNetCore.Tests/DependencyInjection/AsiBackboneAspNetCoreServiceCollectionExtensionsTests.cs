@@ -1,6 +1,7 @@
 using CDCavell.AsiBackbone.AspNetCore.Actors;
 using CDCavell.AsiBackbone.AspNetCore.Correlation;
 using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+using CDCavell.AsiBackbone.AspNetCore.Handshakes;
 using CDCavell.AsiBackbone.AspNetCore.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -79,6 +80,25 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.Equal(StatusCodes.Status428PreconditionRequired, options.AcknowledgmentRequiredStatusCode);
         Assert.Equal(StatusCodes.Status409Conflict, options.EscalationRecommendedStatusCode);
         Assert.False(options.IncludeReasonMessages);
+        Assert.False(options.IncludeTraceId);
+        Assert.False(options.IncludePolicyMetadata);
+    }
+
+    [Fact]
+    public void AddAsiBackboneAspNetCoreRegistersAcknowledgmentChallengeServices()
+    {
+        ServiceCollection services = new();
+
+        _ = services.AddAsiBackboneAspNetCore();
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        using IServiceScope scope = provider.CreateScope();
+        AsiBackboneAcknowledgmentChallengeOptions options =
+            scope.ServiceProvider.GetRequiredService<IOptions<AsiBackboneAcknowledgmentChallengeOptions>>().Value;
+
+        _ = scope.ServiceProvider.GetRequiredService<IAsiBackboneAcknowledgmentChallengeService>();
+        Assert.Equal("ACKNOWLEDGE_RESPONSIBILITY", options.RequiredAcknowledgmentCode);
+        Assert.True(options.IncludeReasonMessage);
         Assert.False(options.IncludeTraceId);
         Assert.False(options.IncludePolicyMetadata);
     }
