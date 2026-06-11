@@ -1,7 +1,6 @@
 using CDCavell.AsiBackbone.Core.Actors;
 using CDCavell.AsiBackbone.Core.Audit;
 using CDCavell.AsiBackbone.Core.Results;
-using CDCavell.AsiBackbone.EntityFrameworkCore;
 using CDCavell.AsiBackbone.EntityFrameworkCore.Audit;
 using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.Data.Sqlite;
@@ -75,7 +74,7 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
         await using HostOwnedAuditDbContext context = CreateInMemoryContext();
         var store = new EfCoreAuditLedgerStore(context);
 
-        context.AuditLedgerRecords.Add(new AsiBackboneAuditLedgerRecordEntity
+        _ = context.AuditLedgerRecords.Add(new AsiBackboneAuditLedgerRecordEntity
         {
             RecordId = "manual-record",
             EventId = "manual-event",
@@ -105,7 +104,7 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
         await using HostOwnedAuditDbContext context = CreateInMemoryContext();
         var store = new EfCoreAuditLedgerStore(context);
 
-        context.AuditLedgerRecords.Add(new AsiBackboneAuditLedgerRecordEntity
+        _ = context.AuditLedgerRecords.Add(new AsiBackboneAuditLedgerRecordEntity
         {
             RecordId = "empty-json-record",
             EventId = "empty-json-event",
@@ -141,7 +140,7 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
     private static AuditLedgerRecord CreateRecord(string recordId, string eventId)
     {
         var actor = AsiBackboneActorContext.Human("actor-branch", "Branch Actor");
-        AuditResidue residue = AuditResidue.Create(
+        var residue = AuditResidue.Create(
             actor,
             "branch.operation",
             "Allowed",
