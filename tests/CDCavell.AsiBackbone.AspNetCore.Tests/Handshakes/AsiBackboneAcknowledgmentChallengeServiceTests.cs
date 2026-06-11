@@ -29,7 +29,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
             IncludeTraceId = true,
             IncludePolicyMetadata = true,
         };
-        var service = CreateService(options);
+        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService(options);
 
         AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(
             actor,
@@ -66,7 +66,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
             traceId: "trace-123",
             policyVersion: "v1",
             policyHash: "hash-123");
-        var service = CreateService();
+        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
 
         AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
 
@@ -82,7 +82,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     {
         var actor = AsiBackboneActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Do not expose this.");
-        var service = CreateService(new AsiBackboneAcknowledgmentChallengeOptions
+        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService(new AsiBackboneAcknowledgmentChallengeOptions
         {
             IncludeReasonMessage = false,
         });
@@ -97,7 +97,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     {
         var actor = AsiBackboneActorContext.Human("user-123");
         var decision = GovernanceDecision.Allow();
-        var service = CreateService();
+        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
             service.CreateChallenge(actor, "RunOperation", decision));
@@ -114,7 +114,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
             "Acknowledgment required.",
             correlationId: "correlation-123",
             traceId: "trace-123");
-        var service = CreateService(new AsiBackboneAcknowledgmentChallengeOptions
+        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService(new AsiBackboneAcknowledgmentChallengeOptions
         {
             RequiredAcknowledgmentCode = "CONFIRM",
         });
@@ -150,7 +150,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     {
         var actor = AsiBackboneActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
-        var service = CreateService();
+        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
         AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
         var response = new AsiBackboneAcknowledgmentChallengeRequest
         {
@@ -173,7 +173,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     {
         var actor = AsiBackboneActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
-        var service = CreateService();
+        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
         AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
         var response = new AsiBackboneAcknowledgmentChallengeRequest
         {
@@ -194,7 +194,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
     {
         var actor = AsiBackboneActorContext.Human("user-123");
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
-        var service = CreateService();
+        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
         AsiBackboneAcknowledgmentChallenge challenge = service.CreateChallenge(actor, "RunOperation", decision);
         var response = new AsiBackboneAcknowledgmentChallengeRequest
         {
