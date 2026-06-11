@@ -18,7 +18,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     [Fact]
     public void ChallengeResultFailureExposesUnacknowledgedStateWithoutAcknowledgment()
     {
-        AsiBackboneAcknowledgmentChallengeResult result = AsiBackboneAcknowledgmentChallengeResult.Failure(
+        var result = AsiBackboneAcknowledgmentChallengeResult.Failure(
             "ack.failed",
             "Acknowledgment failed.");
 
@@ -33,7 +33,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     public void CreateChallengeRejectsNullActor()
     {
         DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
-        GovernanceDecision decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
 
         _ = Assert.Throws<ArgumentNullException>(() => service.CreateChallenge(null!, "RunOperation", decision));
     }
@@ -160,7 +160,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
         DefaultAsiBackboneAcknowledgmentChallengeService service,
         IAsiBackboneActorContext actor)
     {
-        GovernanceDecision decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
 
         return service.CreateChallenge(actor, "RunOperation", decision);
     }

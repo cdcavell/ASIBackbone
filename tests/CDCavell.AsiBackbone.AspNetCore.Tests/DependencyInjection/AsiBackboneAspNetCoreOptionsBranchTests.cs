@@ -60,9 +60,8 @@ public sealed class AsiBackboneAspNetCoreOptionsBranchTests
         var options = new AsiBackboneAspNetCoreOptions
         {
             CorrelationIdHeaderNames = ["X-First", "X-Second"],
+            CorrelationIdHeaderName = "X-Replacement"
         };
-
-        options.CorrelationIdHeaderName = "X-Replacement";
 
         Assert.Equal("X-Replacement", options.CorrelationIdHeaderName);
         Assert.Equal(["X-Replacement"], options.CorrelationIdHeaderNames);
