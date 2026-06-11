@@ -34,12 +34,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolver : IAsiBackb
     {
         HttpContext? httpContext = httpContextAccessor.HttpContext;
 
-        if (httpContext is null)
-        {
-            return new AsiBackboneHttpRequestCorrelation(traceId: Activity.Current?.Id);
-        }
-
-        return new AsiBackboneHttpRequestCorrelation(
+        return httpContext is null
+            ? new AsiBackboneHttpRequestCorrelation(traceId: Activity.Current?.Id)
+            : new AsiBackboneHttpRequestCorrelation(
             ResolveCorrelationId(httpContext),
             ResolveTraceId(httpContext),
             ResolveMetadata(httpContext));
@@ -74,7 +71,7 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolver : IAsiBackb
         return Activity.Current?.Id ?? httpContext.TraceIdentifier;
     }
 
-    private IReadOnlyDictionary<string, string> ResolveMetadata(HttpContext httpContext)
+    private Dictionary<string, string> ResolveMetadata(HttpContext httpContext)
     {
         Dictionary<string, string> metadata = new(StringComparer.Ordinal);
 
@@ -85,11 +82,11 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolver : IAsiBackb
 
         if (options.IncludeRequestPath && httpContext.Request.Path.HasValue)
         {
-            metadata[AsiBackboneHttpRequestMetadataKeys.Path] = httpContext.Request.Path.Value!;
+            metadata[AsiBackboneHttpRequestMetadataKeys.Path] = httpContext.Request.Path.Value;
         }
 
         Endpoint? endpoint = httpContext.GetEndpoint();
-        RouteEndpoint? routeEndpoint = endpoint as RouteEndpoint;
+        var routeEndpoint = endpoint as RouteEndpoint;
 
         if (options.IncludeEndpointDisplayName && !string.IsNullOrWhiteSpace(endpoint?.DisplayName))
         {

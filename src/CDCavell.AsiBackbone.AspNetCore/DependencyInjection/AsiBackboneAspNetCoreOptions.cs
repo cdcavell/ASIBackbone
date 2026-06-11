@@ -15,8 +15,6 @@ public sealed class AsiBackboneAspNetCoreOptions
         "Traceparent",
     ];
 
-    private IList<string> correlationIdHeaderNames = [.. DefaultCorrelationIdHeaderNames];
-
     /// <summary>
     /// Gets or sets a value indicating whether HTTP route values may be included by request-context adapters.
     /// </summary>
@@ -73,11 +71,7 @@ public sealed class AsiBackboneAspNetCoreOptions
     /// <summary>
     /// Gets or sets the HTTP header names checked for correlation identifier propagation.
     /// </summary>
-    public IList<string> CorrelationIdHeaderNames
-    {
-        get => correlationIdHeaderNames;
-        set => correlationIdHeaderNames = value;
-    }
+    public IList<string> CorrelationIdHeaderNames { get; set; } = [.. DefaultCorrelationIdHeaderNames];
 
     /// <summary>
     /// Validates the options.

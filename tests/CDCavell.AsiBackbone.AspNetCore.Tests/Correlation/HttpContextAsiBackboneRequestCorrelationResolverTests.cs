@@ -154,7 +154,11 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
 
     private static RouteEndpoint CreateRouteEndpoint(string pattern, string displayName)
     {
-        RequestDelegate requestDelegate = static _ => Task.CompletedTask;
+        static Task requestDelegate(HttpContext _)
+        {
+            return Task.CompletedTask;
+        }
+
         Endpoint endpoint = new RouteEndpointBuilder(requestDelegate, RoutePatternFactory.Parse(pattern), order: 0)
         {
             DisplayName = displayName,

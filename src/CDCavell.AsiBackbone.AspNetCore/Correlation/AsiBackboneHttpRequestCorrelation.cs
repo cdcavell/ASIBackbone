@@ -6,42 +6,35 @@ namespace CDCavell.AsiBackbone.AspNetCore.Correlation;
 /// <summary>
 /// Represents framework-neutral request correlation data resolved from the current ASP.NET Core HTTP request.
 /// </summary>
-public sealed class AsiBackboneHttpRequestCorrelation
+/// <remarks>
+/// Initializes a new instance of the <see cref="AsiBackboneHttpRequestCorrelation" /> class.
+/// </remarks>
+/// <param name="correlationId">The resolved correlation identifier, when available.</param>
+/// <param name="traceId">The resolved trace identifier, when available.</param>
+/// <param name="metadata">Safe request metadata resolved from the host.</param>
+public sealed class AsiBackboneHttpRequestCorrelation(
+    string? correlationId = null,
+    string? traceId = null,
+    IReadOnlyDictionary<string, string>? metadata = null)
 {
     private static readonly IReadOnlyDictionary<string, string> EmptyMetadata =
         new ReadOnlyDictionary<string, string>(
             new Dictionary<string, string>(StringComparer.Ordinal));
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AsiBackboneHttpRequestCorrelation" /> class.
-    /// </summary>
-    /// <param name="correlationId">The resolved correlation identifier, when available.</param>
-    /// <param name="traceId">The resolved trace identifier, when available.</param>
-    /// <param name="metadata">Safe request metadata resolved from the host.</param>
-    public AsiBackboneHttpRequestCorrelation(
-        string? correlationId = null,
-        string? traceId = null,
-        IReadOnlyDictionary<string, string>? metadata = null)
-    {
-        CorrelationId = NormalizeOptional(correlationId);
-        TraceId = NormalizeOptional(traceId);
-        Metadata = NormalizeMetadata(metadata);
-    }
-
-    /// <summary>
     /// Gets the request correlation identifier, when supplied by the host or propagated request headers.
     /// </summary>
-    public string? CorrelationId { get; }
+    public string? CorrelationId { get; } = NormalizeOptional(correlationId);
 
     /// <summary>
     /// Gets the request trace identifier, when supplied by the host or current activity.
     /// </summary>
-    public string? TraceId { get; }
+    public string? TraceId { get; } = NormalizeOptional(traceId);
 
     /// <summary>
     /// Gets safe request metadata supplied by the ASP.NET Core adapter.
     /// </summary>
-    public IReadOnlyDictionary<string, string> Metadata { get; }
+    public IReadOnlyDictionary<string, string> Metadata { get; } = NormalizeMetadata(metadata);
 
     /// <summary>
     /// Gets a value indicating whether safe request metadata is available.
