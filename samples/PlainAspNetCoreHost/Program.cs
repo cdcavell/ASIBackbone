@@ -13,10 +13,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAsiBackboneAspNetCore();
 
-builder.Services.AddDbContext<PlainHostAsiBackboneDbContext>(options =>
-{
-    options.UseSqlite(builder.Configuration.GetConnectionString("AsiBackbone") ?? "Data Source=asi-backbone-sample.db");
-});
+builder.Services.AddDbContext<PlainHostAsiBackboneDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("AsiBackbone") ?? "Data Source=asi-backbone-sample.db"));
 
 builder.Services.AddScoped<DbContext>(serviceProvider =>
     serviceProvider.GetRequiredService<PlainHostAsiBackboneDbContext>());
@@ -35,7 +32,7 @@ WebApplication app = builder.Build();
 await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
 {
     PlainHostAsiBackboneDbContext dbContext = scope.ServiceProvider.GetRequiredService<PlainHostAsiBackboneDbContext>();
-    await dbContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
+    _ = await dbContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
 }
 
 app.MapGet("/", () => Results.Redirect("/sample/decision"));
@@ -64,11 +61,11 @@ app.MapGet("/sample/decision", async (
         .EvaluateAsync(context, cancellationToken)
         .ConfigureAwait(false);
 
-    AsiBackboneActorContext actor = AsiBackboneActorContext.Human(
+    var actor = AsiBackboneActorContext.Human(
         actorId: "sample-user",
         displayName: "Sample User");
 
-    AuditResidue residue = AuditResidue.FromDecision(
+    var residue = AuditResidue.FromDecision(
         actor,
         "sample.external-api-call",
         decision,
@@ -76,7 +73,7 @@ app.MapGet("/sample/decision", async (
 
     await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
 
-    AuditLedgerRecord record = AuditLedgerRecord.FromResidue(residue);
+    var record = AuditLedgerRecord.FromResidue(residue);
     _ = await ledgerStore.AppendAsync(record, cancellationToken).ConfigureAwait(false);
 
     return Results.Ok(new
@@ -95,10 +92,7 @@ app.MapGet("/sample/decision", async (
 
 app.MapGet("/sample/audit/{correlationId}", (
     string correlationId,
-    InMemoryAuditLedger auditLedger) =>
-{
-    return Results.Ok(auditLedger.GetByCorrelationId(correlationId));
-});
+    InMemoryAuditLedger auditLedger) => Results.Ok(auditLedger.GetByCorrelationId(correlationId)));
 
 app.MapGet("/sample/ledger/{correlationId}", async (
     string correlationId,
@@ -120,7 +114,7 @@ internal sealed class PlainHostAsiBackboneDbContext(DbContextOptions<PlainHostAs
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyAsiBackboneConfigurations();
+        _ = modelBuilder.ApplyAsiBackboneConfigurations();
     }
 }
 
