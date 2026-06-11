@@ -36,7 +36,7 @@ The Core package does **not** require ASP.NET Core, Entity Framework Core, NetCo
 
 Early alpha package family.
 
-The repository has completed the initial Core foundation work and now includes optional persistence packages for in-memory validation and EF Core host-owned persistence. Planned follow-up milestones include ASP.NET Core integration, samples and host validation, signing support, gateway integrations, robotics examples, and stable release packaging.
+The repository has completed the initial Core foundation work and now includes optional persistence packages for in-memory validation, EF Core host-owned persistence and ASP.NET Core integration. Planned follow-up milestones include samples and host validation, signing support, gateway integrations, robotics examples, and stable release packaging.
 
 ## Project Direction
 
