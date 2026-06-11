@@ -13,7 +13,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     {
         var decision = GovernanceDecision.Allow(correlationId: " correlation-123 ");
 
-        var capture = await ExecuteAsync(decision.ToHttpResult());
+        HttpResultCapture capture = await ExecuteAsync(decision.ToHttpResult());
 
         Assert.Equal(StatusCodes.Status200OK, capture.StatusCode);
         Assert.Contains("\"allowed\":true", capture.Body, StringComparison.Ordinal);
@@ -30,7 +30,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
             WarningStatusCode = StatusCodes.Status206PartialContent,
         };
 
-        var capture = await ExecuteAsync(decision.ToHttpResult(options));
+        HttpResultCapture capture = await ExecuteAsync(decision.ToHttpResult(options));
 
         Assert.Equal(StatusCodes.Status206PartialContent, capture.StatusCode);
         Assert.Contains("Warning", capture.Body, StringComparison.Ordinal);
@@ -48,7 +48,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
             policyVersion: "v1",
             policyHash: "hash-secret");
 
-        var capture = await ExecuteAsync(decision.ToHttpResult());
+        HttpResultCapture capture = await ExecuteAsync(decision.ToHttpResult());
 
         Assert.Equal(StatusCodes.Status403Forbidden, capture.StatusCode);
         Assert.Contains("Governance decision denied execution.", capture.Body, StringComparison.Ordinal);
@@ -64,7 +64,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     {
         var decision = GovernanceDecision.Defer("policy.deferred", "Try again later.");
 
-        var capture = await ExecuteAsync(decision.ToHttpResult());
+        HttpResultCapture capture = await ExecuteAsync(decision.ToHttpResult());
 
         Assert.Equal(StatusCodes.Status202Accepted, capture.StatusCode);
         Assert.Contains("Governance decision deferred execution.", capture.Body, StringComparison.Ordinal);
@@ -76,7 +76,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     {
         var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "User acknowledgment required.");
 
-        var capture = await ExecuteAsync(decision.ToHttpResult());
+        HttpResultCapture capture = await ExecuteAsync(decision.ToHttpResult());
 
         Assert.Equal(StatusCodes.Status428PreconditionRequired, capture.StatusCode);
         Assert.Contains("Governance decision requires acknowledgment.", capture.Body, StringComparison.Ordinal);
@@ -88,7 +88,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     {
         var decision = GovernanceDecision.Escalate("escalation.required", "Manual review required.");
 
-        var capture = await ExecuteAsync(decision.ToHttpResult());
+        HttpResultCapture capture = await ExecuteAsync(decision.ToHttpResult());
 
         Assert.Equal(StatusCodes.Status409Conflict, capture.StatusCode);
         Assert.Contains("Governance decision recommends escalation.", capture.Body, StringComparison.Ordinal);
@@ -112,7 +112,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
             IncludePolicyMetadata = true,
         };
 
-        var capture = await ExecuteAsync(decision.ToHttpResult(options));
+        HttpResultCapture capture = await ExecuteAsync(decision.ToHttpResult(options));
 
         Assert.Contains("Host-approved public detail.", capture.Body, StringComparison.Ordinal);
         Assert.Contains("trace-public", capture.Body, StringComparison.Ordinal);
@@ -125,7 +125,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     {
         var result = OperationResult.Success(["Completed with warning."]);
 
-        var capture = await ExecuteAsync(result.ToHttpResult());
+        HttpResultCapture capture = await ExecuteAsync(result.ToHttpResult());
 
         Assert.Equal(StatusCodes.Status200OK, capture.StatusCode);
         Assert.Contains("\"succeeded\":true", capture.Body, StringComparison.Ordinal);
@@ -137,7 +137,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     {
         var result = OperationResult.Failure("operation.denied", "Sensitive failure detail.");
 
-        var capture = await ExecuteAsync(result.ToHttpResult());
+        HttpResultCapture capture = await ExecuteAsync(result.ToHttpResult());
 
         Assert.Equal(StatusCodes.Status400BadRequest, capture.StatusCode);
         Assert.Contains("operation.denied", capture.Body, StringComparison.Ordinal);
@@ -161,7 +161,7 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
             DeniedStatusCode = 99,
         };
 
-        var exception = Assert.Throws<InvalidOperationException>(options.Validate);
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 
         Assert.Contains(nameof(AsiBackboneHttpResultMappingOptions.DeniedStatusCode), exception.Message, StringComparison.Ordinal);
     }
