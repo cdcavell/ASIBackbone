@@ -32,6 +32,12 @@ builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintE
 
 WebApplication app = builder.Build();
 
+await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
+{
+    PlainHostAsiBackboneDbContext dbContext = scope.ServiceProvider.GetRequiredService<PlainHostAsiBackboneDbContext>();
+    await dbContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
+}
+
 app.MapGet("/", () => Results.Redirect("/sample/decision"));
 
 app.MapGet("/sample/decision", async (
