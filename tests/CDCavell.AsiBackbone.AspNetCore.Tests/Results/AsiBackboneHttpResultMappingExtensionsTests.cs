@@ -121,6 +121,28 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     }
 
     [Fact]
+    public async Task ToHttpResultOmitsMissingOptionalDecisionMetadataWhenDiagnosticsAreEnabled()
+    {
+        var decision = GovernanceDecision.Allow();
+        var options = new AsiBackboneHttpResultMappingOptions
+        {
+            IncludeReasonMessages = true,
+            IncludeTraceId = true,
+            IncludePolicyMetadata = true,
+        };
+
+        HttpResultCapture capture = await ExecuteAsync(decision.ToHttpResult(options));
+
+        Assert.Equal(StatusCodes.Status200OK, capture.StatusCode);
+        Assert.DoesNotContain("reasonCodes", capture.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("reasonMessages", capture.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("correlationId", capture.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("traceId", capture.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("policyVersion", capture.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("policyHash", capture.Body, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ToHttpResultMapsSuccessfulOperationResultToSuccessResponse()
     {
         var result = OperationResult.Success(["Completed with warning."]);
@@ -130,6 +152,18 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.Equal(StatusCodes.Status200OK, capture.StatusCode);
         Assert.Contains("\"succeeded\":true", capture.Body, StringComparison.Ordinal);
         Assert.Contains("Completed with warning.", capture.Body, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ToHttpResultMapsSuccessfulOperationResultWithoutWarnings()
+    {
+        var result = OperationResult.Success();
+
+        HttpResultCapture capture = await ExecuteAsync(result.ToHttpResult());
+
+        Assert.Equal(StatusCodes.Status200OK, capture.StatusCode);
+        Assert.Contains("\"succeeded\":true", capture.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("warnings", capture.Body, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -146,6 +180,24 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     }
 
     [Fact]
+    public async Task ToHttpResultCanExposeFailedOperationReasonMessagesWhenConfigured()
+    {
+        var result = OperationResult.Failure("operation.denied", "Host-approved operation detail.");
+        var options = new AsiBackboneHttpResultMappingOptions
+        {
+            IncludeReasonMessages = true,
+            OperationFailureStatusCode = StatusCodes.Status409Conflict,
+            OperationFailureMessage = "Custom safe failure message.",
+        };
+
+        HttpResultCapture capture = await ExecuteAsync(result.ToHttpResult(options));
+
+        Assert.Equal(StatusCodes.Status409Conflict, capture.StatusCode);
+        Assert.Contains("Custom safe failure message.", capture.Body, StringComparison.Ordinal);
+        Assert.Contains("Host-approved operation detail.", capture.Body, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ToHttpResultRejectsNullDecision()
     {
         GovernanceDecision? decision = null;
@@ -154,16 +206,111 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
     }
 
     [Fact]
-    public void ResultMappingOptionsRejectInvalidStatusCode()
+    public void ToHttpResultRejectsNullDecisionOptions()
     {
-        var options = new AsiBackboneHttpResultMappingOptions
-        {
-            DeniedStatusCode = 99,
-        };
+        var decision = GovernanceDecision.Allow();
+        AsiBackboneHttpResultMappingOptions? options = null;
+
+        _ = Assert.Throws<ArgumentNullException>(() => decision.ToHttpResult(options!));
+    }
+
+    [Fact]
+    public void ToHttpResultRejectsNullOperationResult()
+    {
+        OperationResult? result = null;
+
+        _ = Assert.Throws<ArgumentNullException>(() => result!.ToHttpResult());
+    }
+
+    [Fact]
+    public void ToHttpResultRejectsNullOperationResultOptions()
+    {
+        var result = OperationResult.Success();
+        AsiBackboneHttpResultMappingOptions? options = null;
+
+        _ = Assert.Throws<ArgumentNullException>(() => result.ToHttpResult(options!));
+    }
+
+    [Theory]
+    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.SuccessStatusCode))]
+    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.WarningStatusCode))]
+    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.DeniedStatusCode))]
+    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.DeferredStatusCode))]
+    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.AcknowledgmentRequiredStatusCode))]
+    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.EscalationRecommendedStatusCode))]
+    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.OperationFailureStatusCode))]
+    public void ResultMappingOptionsRejectInvalidStatusCode(string propertyName)
+    {
+        var options = new AsiBackboneHttpResultMappingOptions();
+        SetStatusCode(options, propertyName, 99);
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 
-        Assert.Contains(nameof(AsiBackboneHttpResultMappingOptions.DeniedStatusCode), exception.Message, StringComparison.Ordinal);
+        Assert.Contains(propertyName, exception.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.GovernanceDecisionNotAllowedMessage))]
+    [InlineData(nameof(AsiBackboneHttpResultMappingOptions.OperationFailureMessage))]
+    public void ResultMappingOptionsRejectBlankSafeMessages(string propertyName)
+    {
+        var options = new AsiBackboneHttpResultMappingOptions();
+        SetSafeMessage(options, propertyName, "   ");
+
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
+
+        Assert.Contains("safe", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static void SetStatusCode(
+        AsiBackboneHttpResultMappingOptions options,
+        string propertyName,
+        int statusCode)
+    {
+        switch (propertyName)
+        {
+            case nameof(AsiBackboneHttpResultMappingOptions.SuccessStatusCode):
+                options.SuccessStatusCode = statusCode;
+                break;
+            case nameof(AsiBackboneHttpResultMappingOptions.WarningStatusCode):
+                options.WarningStatusCode = statusCode;
+                break;
+            case nameof(AsiBackboneHttpResultMappingOptions.DeniedStatusCode):
+                options.DeniedStatusCode = statusCode;
+                break;
+            case nameof(AsiBackboneHttpResultMappingOptions.DeferredStatusCode):
+                options.DeferredStatusCode = statusCode;
+                break;
+            case nameof(AsiBackboneHttpResultMappingOptions.AcknowledgmentRequiredStatusCode):
+                options.AcknowledgmentRequiredStatusCode = statusCode;
+                break;
+            case nameof(AsiBackboneHttpResultMappingOptions.EscalationRecommendedStatusCode):
+                options.EscalationRecommendedStatusCode = statusCode;
+                break;
+            case nameof(AsiBackboneHttpResultMappingOptions.OperationFailureStatusCode):
+                options.OperationFailureStatusCode = statusCode;
+                break;
+            default:
+                throw new InvalidOperationException("Unknown status code option.");
+        }
+    }
+
+    private static void SetSafeMessage(
+        AsiBackboneHttpResultMappingOptions options,
+        string propertyName,
+        string message)
+    {
+        switch (propertyName)
+        {
+            case nameof(AsiBackboneHttpResultMappingOptions.GovernanceDecisionNotAllowedMessage):
+                options.GovernanceDecisionNotAllowedMessage = message;
+                break;
+            case nameof(AsiBackboneHttpResultMappingOptions.OperationFailureMessage):
+                options.OperationFailureMessage = message;
+                break;
+            default:
+                throw new InvalidOperationException("Unknown message option.");
+        }
     }
 
     private static async Task<HttpResultCapture> ExecuteAsync(IResult result)
