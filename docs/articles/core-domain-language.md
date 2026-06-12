@@ -1,6 +1,6 @@
 # Core Domain Language and Alpha Boundary
 
-This article defines the initial domain language for `CDCavell.AsiBackbone.Core` and the intended `0.1.0-alpha.1` package boundary.
+This article defines the initial domain language for `CDCavell.AsiBackbone.Core` and the host-neutral package boundary that the rest of the AsiBackbone package family builds on.
 
 `CDCavell.AsiBackbone.Core` is the framework-neutral foundation for the AsiBackbone package family. Its purpose is to define shared primitives for governing consequential software actions through explicit policy, constraint, acknowledgment, audit, and capability boundaries.
 
@@ -24,7 +24,7 @@ Intent or request
   -> Host or gateway execution
 ```
 
-Core defines the language and primitive contracts for this lane. It should not decide how a host persists records, exposes HTTP endpoints, wires middleware, or connects to an AI model.
+Core defines the language and primitive contracts for this lane. It does not decide how a host persists records, exposes HTTP endpoints, wires middleware, or connects to an AI model.
 
 ## Domain terms
 
@@ -75,7 +75,7 @@ A collapse boundary is the point where open possibility becomes a concrete softw
 
 In Core, this is a practical software boundary, not a physical collapse claim. It marks the transition from proposed intent to one of the supported decision outcomes.
 
-Supported initial decision outcomes are:
+Supported decision outcomes are:
 
 * `Allowed`
 * `Warning`
@@ -88,7 +88,7 @@ Supported initial decision outcomes are:
 
 The Core abstraction for this concept is `IAsiBackboneActorContext`.
 
-Host integrations may map their current-user, current-service, worker, or agent identity model into this abstraction. For example, a future ASP.NET Core integration may adapt a host `ClaimsPrincipal` into `IAsiBackboneActorContext`, but Core itself must not depend on `ClaimsPrincipal`, `HttpContext`, authentication middleware, or any specific host identity provider.
+Host integrations may map their current-user, current-service, worker, or agent identity model into this abstraction. For example, the ASP.NET Core integration can adapt a host `ClaimsPrincipal` into Core-compatible actor context, but Core itself must not depend on `ClaimsPrincipal`, `HttpContext`, authentication middleware, or any specific host identity provider.
 
 Actor context describes who or what is requesting the action.
 
@@ -124,7 +124,7 @@ A useful decision result should answer:
 * which reason codes explain the outcome
 * which correlation ID links the decision to logs and audit records
 
-The decision result should be one of the central primitives in Core.
+The decision result is one of the central primitives in Core.
 
 ### Operation result
 
@@ -153,12 +153,9 @@ It may include:
 * timestamp
 * optional signature metadata
 
-Core should define audit-oriented primitives without requiring a specific storage provider.
+Core defines audit-oriented primitives without requiring a specific storage provider.
 
-A persistent audit ledger record is the storage-ready snapshot of audit residue.
-Core defines the record shape and storage contract only. Concrete persistence,
-database mappings, migrations, signing, retention, and archival behavior belong
-to host applications or future storage/signing packages.
+A persistent audit ledger record is the storage-ready snapshot of audit residue. Core defines the record shape and storage contract. Concrete persistence, database mappings, migrations, signing, retention, and archival behavior belong to host applications or integration packages.
 
 ### Acknowledgment and responsibility handshake
 
@@ -181,7 +178,7 @@ A capability token should be:
 * revocable where possible
 * signed or verifiable where appropriate
 
-Core should define token concepts and contracts. Signing implementation can live in a later signing package.
+Core defines token concepts and contracts. Signing implementation can live in a later signing package.
 
 ### Gateway boundary
 
@@ -191,13 +188,13 @@ The gateway pattern ensures that a host or integration layer validates the decis
 
 Robotics, physical execution, and other high-risk gateway examples should remain later integration scenarios after the Core governance pattern is stable.
 
-## `0.1.0-alpha.1` Core boundary
+## Core boundary
 
-The `0.1.0-alpha.1` boundary should establish language and primitives, not a full integration stack.
+The Core boundary establishes language and primitives, not a full integration stack.
 
 ### In scope for Core
 
-`CDCavell.AsiBackbone.Core` may include:
+`CDCavell.AsiBackbone.Core` includes framework-neutral governance primitives such as:
 
 * framework-neutral domain abstractions
 * actor context primitives
@@ -230,18 +227,18 @@ The `0.1.0-alpha.1` boundary should establish language and primitives, not a ful
 * robotics control implementation
 * AI model hosting, training, inference, or orchestration
 
-## Future package ownership
+## Package ownership
 
-Future packages can build on Core without changing its host-neutral boundary.
+The current and planned package ownership model is:
 
 | Package area | Ownership |
 | --- | --- |
 | `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives and domain language. |
-| `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core service registration, middleware, endpoints, current-actor resolution, and HTTP policy hooks. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Demo and test storage for early validation. |
-| `CDCavell.AsiBackbone.Storage.EntityFrameworkCore` | EF Core model configuration and persistence hooks while the host owns the `DbContext`. |
-| `CDCavell.AsiBackbone.Signing` | Signing and verification helpers for receipts, policy hashes, and capability tokens. |
-| `CDCavell.AsiBackbone.Samples` | Console, worker, ASP.NET Core, and NetCoreApplicationTemplate-based examples. |
+| `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, and local validation hosts. |
+| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and persistence hooks while the host owns the `DbContext`, provider, migrations, and schema lifecycle. |
+| `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core service registration, request correlation, HTTP actor/context seams, HTTP result mapping, and acknowledgment challenge helpers. |
+| `CDCavell.AsiBackbone.Signing` | Planned future signing and verification helpers for receipts, policy hashes, and capability tokens. |
+| `CDCavell.AsiBackbone.Samples` | Planned future sample package or continuing samples area for console, worker, ASP.NET Core, and NetCoreApplicationTemplate-based examples. |
 | `CDCavell.AsiBackbone.Robotics` | Later simulated or physical gateway examples after the governance spine is proven. |
 
 ## Alignment boundary
