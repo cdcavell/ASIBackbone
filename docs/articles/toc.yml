@@ -7,8 +7,8 @@
 - name: Why AsiBackbone?
   href: why-asi-backbone.md
 
-- name: Framework-Neutral Integration
-  href: integration-boundaries.md
+- name: Adoption and Target Use Cases
+  href: use-cases.md
 
 - name: Core Domain Language
   href: core-domain-language.md
