@@ -102,7 +102,7 @@ jobs:
             $indexFile = Get-ChildItem -Path $ReportRoot -Filter "index.html" -Recurse | Select-Object -First 1
 
             if ($null -eq $indexFile) {
-              Write-Host "Stryker report files found under $ReportRoot:"
+              Write-Host "Stryker report files found under ${ReportRoot}:"
               Get-ChildItem -Path $ReportRoot -Recurse | ForEach-Object { Write-Host $_.FullName }
               throw "Stryker mutation report index.html was not found under $ReportRoot."
             }
