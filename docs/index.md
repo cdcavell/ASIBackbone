@@ -2,7 +2,7 @@
 
 Welcome to the ASI Backbone documentation site.
 
-AsiBackbone is a .NET governance and policy-control framework inspired by the ASI Backbone concept. The project begins as a **governance spine**, not an intelligence engine. Its purpose is to define practical software patterns for policy evaluation, decision results, acknowledgment workflows, audit receipts, capability-gated execution, and host integration.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance and policy-control framework inspired by broader Eden/Backbone governance concepts, but implemented as practical software infrastructure. The project begins as a **governance spine**, not an intelligence engine. Its purpose is to define practical software patterns for policy evaluation, decision results, acknowledgment workflows, audit receipts, capability-gated execution, and host integration.
 
 > [!IMPORTANT]
 > AsiBackbone does not implement artificial superintelligence. It provides framework-neutral building blocks for governing consequential actions in software systems.
@@ -13,10 +13,10 @@ AsiBackbone is a .NET governance and policy-control framework inspired by the AS
   Project orientation, local build instructions, and the current package direction.
 
 * [Core Domain Language](articles/core-domain-language.md)
-  Initial terminology and Core boundary for governance spine, constraints, collapse boundary, actor context, decision results, audit residue, acknowledgment, capability tokens, and gateway boundaries.
+  Initial terminology and Core boundary for Accountable Systems Infrastructure, governance spine, constraints, collapse boundary, actor context, decision results, audit residue, acknowledgment, capability tokens, and gateway boundaries.
 
 * [Equations and Toy Models](articles/equations-and-toy-models.md)
-  Explains the conceptual progression from `Λ(t)` to `Λ(τ)` to `ΛS(x, τ)` and maps the Eden/ASI collapse notation into practical AsiBackbone software terms: active policy structure, allowed decision states, acknowledgment, audit residue, and gateway-safe execution.
+  Explains the conceptual progression from `Λ(t)` to `Λ(τ)` to `ΛS(x, τ)` and maps the Eden/Backbone collapse notation into practical AsiBackbone software terms: active policy structure, allowed decision states, acknowledgment, audit residue, and gateway-safe execution.
 
 * [Alpha Package Boundary](articles/alpha-package-boundary.md)
   Focused release-boundary guidance for the Core package and integration package boundaries.
@@ -43,13 +43,14 @@ Planned article: `articles/asi-backbone-concept.md`
 
 This page should summarize the ASI Backbone concept in plain technical language:
 
+* ASI as Accountable Systems Infrastructure
 * AsiBackbone as a governance spine
 * Policy-controlled decision flow
 * Controlled collapse through constraints
 * Regional/local policy enforcement
 * Auditability and responsibility trails
 * Gateway patterns for external systems
-* Clear boundary that this project is not an ASI implementation
+* Clear boundary that this project is not an artificial superintelligence implementation
 
 ### Dynamic Liability Handshake
 
@@ -255,4 +256,4 @@ This gives AsiBackbone a practical software foundation while preserving the broa
 
 AsiBackbone should make consequential software actions easier to govern, audit, constrain, acknowledge, and explain.
 
-It should not pretend to be an intelligence engine.
+It should be understood as Accountable Systems Infrastructure, not an intelligence engine.
