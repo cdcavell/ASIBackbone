@@ -7,19 +7,19 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 ## Application documentation
 
 * [Core Domain Language and Alpha Boundary](core-domain-language.md)
-  Defines the initial Core terminology for governance spine, constraints, collapse boundary, audit residue, actor context, decision results, operation results, acknowledgment, capability tokens, and gateway boundaries.
+  Defines the Core terminology for governance spine, constraints, collapse boundary, audit residue, actor context, decision results, operation results, acknowledgment, capability tokens, and gateway boundaries.
 
 * [Equations and Toy Models](equations-and-toy-models.md)
   Explains the conceptual progression from `Λ(t)` to `Λ(τ)` to `ΛS(x, τ)` and maps the Eden/ASI collapse notation into practical AsiBackbone software terms: active policy structure, allowed decision states, acknowledgment, audit residue, and gateway-safe execution.
 
 * [Alpha Package Boundary](alpha-package-boundary.md)
-  Documents the intended `0.1.0-alpha.1` boundary for `CDCavell.AsiBackbone.Core`, including what belongs in Core and what belongs in later integration packages.
+  Documents the original `0.1.0-alpha.1` boundary for `CDCavell.AsiBackbone.Core`, including what belongs in Core and what belongs in integration packages.
 
 * [EF Core Integration Boundary](ef-core-integration-boundary.md)  
-  Defines the intended boundary for the future EF Core storage package, including host-owned `DbContext`, migration ownership, provider-neutral configuration, and `ModelBuilder` extension expectations.
+  Defines the implemented boundary for `CDCavell.AsiBackbone.EntityFrameworkCore`, including host-owned `DbContext`, migration ownership, provider-neutral configuration, and `ModelBuilder` extension guidance.
 
 * [EF Core Host Ownership and Migration Guidance](ef-core-host-ownership-and-migrations.md)  
   Explains how host applications own the EF Core `DbContext`, provider, connection string, migrations, schema deployment, and operational lifecycle while applying ASI Backbone model configurations.
 
 * [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md)  
-  Defines the intended web-host adapter boundary for the future ASP.NET Core package, including service registration, middleware, endpoint mapping, current-actor seams, HTTP outcome mapping, and compatibility with both plain ASP.NET Core and NetCoreApplicationTemplate hosts.
+  Defines the implemented web-host adapter boundary for `CDCavell.AsiBackbone.AspNetCore`, including service registration, request correlation, audit enrichment, HTTP outcome mapping, acknowledgment challenge helpers, and compatibility with both plain ASP.NET Core and NetCoreApplicationTemplate hosts.
