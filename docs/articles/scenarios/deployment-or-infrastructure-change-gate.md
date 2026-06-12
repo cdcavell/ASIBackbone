@@ -20,33 +20,26 @@ This scenario is useful when a change is consequential enough that the host need
 
 ## Sequence
 
-```mermaid
-sequenceDiagram
-    participant Actor as "Requesting actor or pipeline"
-    participant Host as "Host platform"
-    participant Backbone as "AsiBackbone evaluator"
-    participant Ack as "Acknowledgment flow"
-    participant Audit as "Audit sink or ledger"
-    participant Automation as "Host owned automation"
+```text
+Requesting actor or pipeline
+  -> Host platform: proposes deployment or infrastructure change
+  -> Host platform: builds policy context from actor, environment, risk, and metadata
+  -> AsiBackbone evaluator: evaluates policy context
+  -> Host platform: receives governance decision
 
-    Actor->>Host: Proposes deployment or infrastructure change
-    Host->>Host: Build policy context from actor, environment, risk, and metadata
-    Host->>Backbone: EvaluateAsync(context)
-    Backbone-->>Host: GovernanceDecision
-    alt Denied, deferred, or escalation recommended
-        Host->>Audit: Persist decision residue
-        Host-->>Actor: Return governed outcome without execution
-    else Acknowledgment required
-        Host->>Ack: Present acknowledgment challenge
-        Ack-->>Host: Accepted or rejected response
-        Host->>Audit: Persist decision and acknowledgment residue
-        opt Accepted and host policy permits execution
-            Host->>Automation: Run host owned automation
-        end
-    else Allowed or warning
-        Host->>Audit: Persist decision residue
-        Host->>Automation: Run host owned automation
-    end
+If denied, deferred, or escalation-recommended:
+  -> Host platform persists decision residue
+  -> Host platform returns governed outcome without execution
+
+If acknowledgment-required:
+  -> Host platform presents acknowledgment challenge
+  -> Acknowledgment layer returns accepted or rejected response
+  -> Host platform persists decision and acknowledgment residue
+  -> Host platform runs automation only if accepted and host policy permits execution
+
+If allowed or warning:
+  -> Host platform persists decision residue
+  -> Host platform decides whether and how to run host-owned automation
 ```
 
 ## Example changes
