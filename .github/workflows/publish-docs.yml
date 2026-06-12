@@ -70,8 +70,9 @@ jobs:
 
       - name: Generate Core mutation report
         shell: pwsh
+        working-directory: tests/CDCavell.AsiBackbone.Core.Tests
         run: |
-          dotnet tool run dotnet-stryker -- --config-file ./stryker/stryker-core-config.json
+          dotnet tool run dotnet-stryker -- --config-file stryker-config.json
 
       - name: Build DocFX site
         run: dotnet tool run docfx -- docs/docfx.json
