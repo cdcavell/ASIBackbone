@@ -23,14 +23,16 @@
 [![NuGet EntityFrameworkCore](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.EntityFrameworkCore?label=EntityFrameworkCore)](https://www.nuget.org/packages/CDCavell.AsiBackbone.EntityFrameworkCore)
 [![NuGet EntityFrameworkCore Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.EntityFrameworkCore?label=EntityFrameworkCore%20downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.EntityFrameworkCore)
 
-`CDCavell.AsiBackbone` is a .NET package family for building a governance spine around consequential software actions.
+`CDCavell.AsiBackbone` is a .NET package family for building an **Accountable Systems Infrastructure Backbone** around consequential software actions.
+
+In this software project, **ASI** means **Accountable Systems Infrastructure**. The package name uses `AsiBackbone` to preserve stable .NET identifiers, while the documentation frames the acronym as governance infrastructure rather than artificial superintelligence.
 
 It helps a host application evaluate intent before execution, apply policy constraints, require acknowledgment when needed, preserve audit residue, and optionally scope follow-on execution through capability tokens.
 
 AsiBackbone should be understood as **governance infrastructure**, not an intelligence engine.
 
 > [!IMPORTANT]
-> These packages do **not** implement artificial superintelligence, host AI models, train AI models, control robots, or prove the ASI Backbone concept. They provide framework-neutral building blocks and host integration seams for governing consequential actions in software systems.
+> These packages do **not** implement artificial superintelligence, host AI models, train AI models, control robots, or prove the Eden/Backbone framework. They provide framework-neutral building blocks and host integration seams for governing consequential actions in software systems.
 
 ## What problem does this solve?
 
@@ -94,6 +96,7 @@ AsiBackbone does not:
 - Replace normal authentication or authorization.
 - Guarantee compliance with any law, regulation, audit framework, or security standard.
 - Host, train, run, or orchestrate AI models.
+- Implement artificial superintelligence.
 - Execute tools, APIs, infrastructure changes, or robot commands by itself.
 - Own the consuming application's database, migrations, deployment, or operational policy.
 - Replace legal review, AI safety governance, organizational accountability, or operational security.
@@ -151,6 +154,7 @@ Important terms:
 
 | Term | Meaning |
 | --- | --- |
+| Accountable Systems Infrastructure | The project meaning of ASI: infrastructure that makes consequential software decisions policy-shaped, auditable, acknowledgment-aware, and capability-bounded. |
 | Governance spine | The software path that every consequential action follows before execution. |
 | Intent or request | The proposed action that needs evaluation. |
 | Constraint | A rule, policy, condition, or boundary that narrows available outcomes. |
@@ -329,18 +333,19 @@ For validation guidance, see [NetCoreApplicationTemplate Host Validation](docs/a
 
 ## Alignment Boundary
 
-AsiBackbone documentation may reference the broader ASI Backbone concept and Eden/ASI framework as conceptual inspiration.
+In this repository, ASI means **Accountable Systems Infrastructure**. AsiBackbone documentation may reference the broader Eden/Backbone framework as conceptual inspiration, but implementation claims should remain grounded in practical software governance.
 
 Safe language:
 
-- AsiBackbone is inspired by the ASI Backbone framework.
+- AsiBackbone stands for Accountable Systems Infrastructure Backbone.
 - AsiBackbone implements governance-oriented software primitives.
 - AsiBackbone helps structure consequential decision flow through constraints, acknowledgment, audit, and capability boundaries.
 - AsiBackbone can surround intelligent or decision-producing systems with accountable execution infrastructure.
+- AsiBackbone is inspired by broader Eden/Backbone governance concepts without claiming to implement artificial superintelligence.
 
 Avoid language such as:
 
-- AsiBackbone implements ASI.
+- AsiBackbone implements artificial superintelligence.
 - AsiBackbone proves the Eden Hypothesis.
 - AsiBackbone is an AI model.
 - AsiBackbone replaces AI safety governance, legal review, or organizational accountability.
@@ -355,4 +360,4 @@ Avoid language such as:
 - Let integration packages own persistence, web integration, signing, storage, samples, and external execution concerns.
 - Keep package boundaries clear before adding behavior.
 - Treat NetCoreApplicationTemplate as a preferred host, not a parent framework.
-- Treat AsiBackbone as governance infrastructure, not an intelligence engine.
+- Treat AsiBackbone as Accountable Systems Infrastructure: governance infrastructure, not an intelligence engine.
