@@ -2,10 +2,12 @@
 
 AsiBackbone is a .NET governance package for systems that need to decide what may happen before anything consequential happens.
 
+In this software project, **ASI** means **Accountable Systems Infrastructure**. The package family is designed as infrastructure for accountable decision flow, not as artificial superintelligence.
+
 It provides policy, acknowledgment, audit, and capability-control primitives that can sit between intent and execution. A host application can use these primitives to evaluate a proposed action, explain why it was allowed or blocked, require human acknowledgment when appropriate, and leave an audit trail that can be reviewed later.
 
 > [!IMPORTANT]
-> AsiBackbone is not an artificial superintelligence implementation, AI model host, AI training framework, legal-compliance guarantee, or robotics control system. It is governance infrastructure for software systems that need accountable decision flow.
+> AsiBackbone is not an artificial superintelligence implementation, AI model host, AI training framework, legal-compliance guarantee, or robotics control system. It is Accountable Systems Infrastructure for software systems that need governed, auditable decision flow.
 
 ## The problem it solves
 
@@ -110,14 +112,15 @@ A small first adoption can be simple:
 
 This lets a team introduce governance incrementally without rewriting the entire application.
 
-## Relationship to the broader ASI Backbone concept
+## Relationship to the broader Backbone concept
 
-The package is inspired by the ASI Backbone framework, especially the idea that open possibility should not become arbitrary action. In software terms, a request should only become an executable action when the active policy structure allows it.
+The package is inspired by the broader Eden/Backbone framework, especially the idea that open possibility should not become arbitrary action. In software terms, a request should only become an executable action when the active policy structure allows it.
 
 That conceptual inspiration is useful, but the package boundary remains practical:
 
 - It implements governance-oriented software primitives.
-- It does not implement ASI.
+- It treats ASI as Accountable Systems Infrastructure.
+- It does not implement artificial superintelligence.
 - It does not prove the Eden Hypothesis or any theory of intelligence.
 - It does not replace legal review, AI safety governance, organizational accountability, or operational security.
 
