@@ -13,6 +13,13 @@
       "high": 80,
       "low": 60,
       "break": 0
-    }
+    },
+    "mutate": [
+      "../../src/CDCavell.AsiBackbone.AspNetCore/Handshakes/AsiBackboneAcknowledgmentChallenge.cs",
+      "../../src/CDCavell.AsiBackbone.AspNetCore/Handshakes/AsiBackboneAcknowledgmentChallengeOptions.cs",
+      "../../src/CDCavell.AsiBackbone.AspNetCore/Handshakes/AsiBackboneAcknowledgmentChallengeRequest.cs",
+      "../../src/CDCavell.AsiBackbone.AspNetCore/Handshakes/AsiBackboneAcknowledgmentChallengeResult.cs",
+      "../../src/CDCavell.AsiBackbone.AspNetCore/Handshakes/DefaultAsiBackboneAcknowledgmentChallengeService.cs"
+    ]
   }
 }
