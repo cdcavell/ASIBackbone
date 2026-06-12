@@ -33,9 +33,9 @@ sequenceDiagram
     Host->>Host: Build policy context from actor, target, risk, and metadata
     Host->>Backbone: EvaluateAsync(context)
     Backbone-->>Host: GovernanceDecision
-    alt Denied, Deferred, or EscalationRecommended
+    alt Denied Deferred or EscalationRecommended
         Host->>Audit: Persist decision residue
-        Host-->>Agent: Do not execute; return governed outcome
+        Host-->>Agent: Do not execute and return governed outcome
     else AcknowledgmentRequired
         Host->>Ack: Create and present challenge
         Ack-->>Host: Accepted or rejected response
