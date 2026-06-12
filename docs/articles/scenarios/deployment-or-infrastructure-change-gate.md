@@ -22,30 +22,30 @@ This scenario is useful when a change is consequential enough that the host need
 
 ```mermaid
 sequenceDiagram
-    participant Actor as Requesting actor or pipeline
-    participant Host as Host platform
-    participant Backbone as AsiBackbone evaluator
-    participant Ack as Acknowledgment flow
-    participant Audit as Audit sink or ledger
-    participant Automation as Host-owned automation
+    participant Actor as "Requesting actor or pipeline"
+    participant Host as "Host platform"
+    participant Backbone as "AsiBackbone evaluator"
+    participant Ack as "Acknowledgment flow"
+    participant Audit as "Audit sink or ledger"
+    participant Automation as "Host owned automation"
 
     Actor->>Host: Proposes deployment or infrastructure change
     Host->>Host: Build policy context from actor, environment, risk, and metadata
     Host->>Backbone: EvaluateAsync(context)
     Backbone-->>Host: GovernanceDecision
-    alt Denied Deferred or EscalationRecommended
+    alt Denied, deferred, or escalation recommended
         Host->>Audit: Persist decision residue
         Host-->>Actor: Return governed outcome without execution
-    else AcknowledgmentRequired
+    else Acknowledgment required
         Host->>Ack: Present acknowledgment challenge
         Ack-->>Host: Accepted or rejected response
         Host->>Audit: Persist decision and acknowledgment residue
         opt Accepted and host policy permits execution
-            Host->>Automation: Run host-owned automation
+            Host->>Automation: Run host owned automation
         end
-    else Allowed or Warning
+    else Allowed or warning
         Host->>Audit: Persist decision residue
-        Host->>Automation: Run host-owned automation
+        Host->>Automation: Run host owned automation
     end
 ```
 
