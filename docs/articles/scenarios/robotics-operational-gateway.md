@@ -123,7 +123,7 @@ No valid policy decision, no valid token, no valid gateway check, no physical co
 
 ## Simulated command-validation example
 
-The following example is intentionally simulated. It demonstrates the shape of a host-owned validation flow without claiming that AsiBackbone currently provides robot-control functionality.
+The following example is intentionally simulated. It demonstrates the shape of a host-owned validation flow without claiming that AsiBackbone currently provides robot-control functionality. The `SimulatedGatewayResult` and `SimulatedRobotGateway` types represent host-defined placeholders, not current AsiBackbone API types.
 
 ```csharp
 IReadOnlyDictionary<string, string> metadata = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -157,7 +157,7 @@ if (decision.Outcome is GovernanceDecisionOutcome.Denied
     or GovernanceDecisionOutcome.EscalationRecommended)
 {
     await auditSink.WriteAsync(
-        AuditResidue.FromDecision(actor, "robot.move", decision, metadata),
+        AuditResidue.FromDecision(actor, "robot.move", decision, metadata: metadata),
         cancellationToken);
 
     return SimulatedGatewayResult.FailClosed("Governance decision did not permit execution.");
