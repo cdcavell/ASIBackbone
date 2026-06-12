@@ -2,26 +2,45 @@
 
 This guide explains the current direction of the AsiBackbone repository and how to begin working with the project.
 
-AsiBackbone is currently in an early foundation stage. The first package focus is `CDCavell.AsiBackbone.Core`, a dependency-light package intended to define shared contracts, abstractions, result primitives, and domain language.
+AsiBackbone is an early alpha .NET package family for governance-oriented decision flow. The foundation package is `CDCavell.AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, and ASP.NET Core host integration.
 
 > [!IMPORTANT]
 > This project does not implement artificial superintelligence. It provides governance-oriented software building blocks inspired by the ASI Backbone framework.
 
 ## Current status
 
-The repository is currently focused on establishing the Core package boundary before adding persistence, ASP.NET Core integration, samples, or stable packaging.
+The repository has completed the initial Core foundation work and now includes optional packages for in-memory validation, EF Core host-owned persistence, and ASP.NET Core host integration.
+
+The current implemented alpha package lineup is:
+
+```text
+CDCavell.AsiBackbone.Core
+CDCavell.AsiBackbone.Storage.InMemory
+CDCavell.AsiBackbone.EntityFrameworkCore
+CDCavell.AsiBackbone.AspNetCore
+```
+
+Planned or later package areas remain separate from the current implemented lineup:
+
+```text
+CDCavell.AsiBackbone.Signing
+CDCavell.AsiBackbone.Samples
+CDCavell.AsiBackbone.Robotics
+```
 
 The current implementation direction is:
 
-1. Abstractions
-2. Policy pipeline
+1. Core governance primitives
+2. Policy evaluator pipeline
 3. Decision result model
 4. Acknowledgment/handshake workflow
-5. Audit receipt
-6. Capability token
-7. ASP.NET Core integration
-8. Sample app
-9. Documentation
+5. Audit residue and audit ledger contracts
+6. Capability token abstractions
+7. In-memory local validation storage
+8. EF Core host-owned persistence integration
+9. ASP.NET Core host integration
+10. Plain ASP.NET Core sample host
+11. Documentation and host-validation guidance
 
 ## Prerequisites
 
@@ -117,19 +136,20 @@ Possible context values include:
 
 A policy evaluator determines whether the request can proceed.
 
-Expected outcomes include:
+Implemented governance outcomes include:
 
-* `Allow`
-* `Deny`
-* `Defer`
-* `RequireAcknowledgment`
-* `Escalate`
+* `Allowed`
+* `Warning`
+* `Denied`
+* `Deferred`
+* `AcknowledgmentRequired`
+* `EscalationRecommended`
 
-These outcomes should be represented by a shared decision result model so that every package can reason about decisions consistently.
+These outcomes are represented by `GovernanceDecision` and `GovernanceDecisionOutcome` so every package can reason about decisions consistently.
 
 ## Decision result
 
-The decision result should become one of the central objects in the package family.
+The decision result is one of the central objects in the package family.
 
 A decision result should answer:
 
@@ -204,13 +224,13 @@ Early examples should focus on safe software scenarios:
 
 Robotics and physical execution should remain later-stage examples after the core governance pattern is stable.
 
-## Current package
+## Current packages
 
 ## CDCavell.AsiBackbone.Core
 
-`CDCavell.AsiBackbone.Core` is the current foundation package.
+`CDCavell.AsiBackbone.Core` is the framework-neutral foundation package.
 
-It should provide:
+It provides:
 
 * Framework-neutral abstractions
 * Decision/result primitives
@@ -218,9 +238,8 @@ It should provide:
 * Acknowledgment contracts
 * Audit contracts
 * Capability-token contracts
-* Shared domain language
 
-It should avoid:
+It avoids:
 
 * ASP.NET Core dependencies
 * Entity Framework Core dependencies
@@ -230,13 +249,26 @@ It should avoid:
 * Database-provider assumptions
 * Direct dependency on NetCoreApplicationTemplate
 
+## CDCavell.AsiBackbone.Storage.InMemory
+
+`CDCavell.AsiBackbone.Storage.InMemory` provides non-durable in-memory storage helpers for tests, samples, and local validation hosts.
+
+It should not be used as durable production storage.
+
+## CDCavell.AsiBackbone.EntityFrameworkCore
+
+`CDCavell.AsiBackbone.EntityFrameworkCore` provides EF Core model configuration and durable accountability persistence while preserving host ownership of the `DbContext`, provider, connection string, migrations, deployment, and schema lifecycle.
+
+## CDCavell.AsiBackbone.AspNetCore
+
+`CDCavell.AsiBackbone.AspNetCore` provides thin ASP.NET Core host adapters for service registration, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge helpers.
+
+It does not own authentication, authorization, persistence, route exposure, UI rendering, policy definitions, or operational execution.
+
 ## Planned package areas
 
-Future packages may include:
+Future package areas may include:
 
-* `CDCavell.AsiBackbone.AspNetCore`
-* `CDCavell.AsiBackbone.Storage.InMemory`
-* `CDCavell.AsiBackbone.Storage.EntityFrameworkCore`
 * `CDCavell.AsiBackbone.Signing`
 * `CDCavell.AsiBackbone.Samples`
 * `CDCavell.AsiBackbone.Robotics`
@@ -260,7 +292,7 @@ Consumer application
     = chooses whether to use either or both
 ```
 
-A consumer should eventually be able to use AsiBackbone in:
+A consumer can use AsiBackbone in:
 
 * an application generated from NetCoreApplicationTemplate
 * an existing ASP.NET Core application
@@ -268,21 +300,9 @@ A consumer should eventually be able to use AsiBackbone in:
 
 ## Recommended first implementation target
 
-The first useful vertical slice should prove the basic decision flow without requiring ASP.NET Core, EF Core, or external infrastructure.
+The first useful vertical slice was to prove the basic decision flow without requiring ASP.NET Core, EF Core, or external infrastructure.
 
-A strong first target would include:
-
-1. A request/intent abstraction
-2. A policy context abstraction
-3. A policy evaluator abstraction
-4. A decision result model
-5. Reason codes
-6. Correlation ID support
-7. Policy version/hash fields
-8. A basic audit receipt abstraction
-9. Unit tests around allow, deny, defer, require acknowledgment, and escalate outcomes
-
-After that foundation is stable, integration packages can build on it.
+That foundation now supports integration packages that build on Core while preserving host ownership.
 
 ## Documentation guidance
 
