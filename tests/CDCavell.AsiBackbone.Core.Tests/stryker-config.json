@@ -1,7 +1,7 @@
 {
   "stryker-config": {
     "solution": "../../AsiBackbone.slnx",
-    "project": "../../src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj",
+    "project": "CDCavell.AsiBackbone.Core.csproj",
     "target-framework": "net10.0",
     "configuration": "Release",
     "reporters": [
@@ -9,17 +9,15 @@
       "cleartext"
     ],
     "report-file-name": "index",
-    "report-dir": "../../artifacts/mutation-report/core",
     "thresholds": {
       "high": 80,
       "low": 60,
       "break": 0
     },
     "mutate": [
-      "../../src/CDCavell.AsiBackbone.Core/**/*.cs",
-      "!../../src/CDCavell.AsiBackbone.Core/**/obj/**/*.cs",
-      "!../../src/CDCavell.AsiBackbone.Core/**/bin/**/*.cs",
-      "!../../src/CDCavell.AsiBackbone.Core/**/*.g.cs"
+      "!**/obj/**/*.cs",
+      "!**/bin/**/*.cs",
+      "!**/*.g.cs"
     ]
   }
 }
