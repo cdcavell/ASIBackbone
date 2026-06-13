@@ -64,6 +64,22 @@ function Resolve-Version {
     return "$VersionPrefix-$VersionSuffix"
 }
 
+function Resolve-StableAssemblyVersion {
+    param([string]$SemanticVersion)
+
+    $versionMatch = [regex]::Match($SemanticVersion, '^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?:-[0-9A-Za-z][0-9A-Za-z.-]*)?$')
+    if (-not $versionMatch.Success) {
+        return $null
+    }
+
+    $major = [int]$versionMatch.Groups['major'].Value
+    if ($major -eq 0) {
+        $major = 1
+    }
+
+    return "$major.0.0.0"
+}
+
 function Assert-Equal {
     param(
         [string]$Actual,
@@ -112,7 +128,12 @@ if ($ExpectedVersion -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$') {
 }
 
 Assert-Equal $resolvedDirectoryVersion $ExpectedVersion 'Directory.Build.props resolved version'
-Assert-Equal (Get-ProjectProperty $directoryBuildPropsPath 'AssemblyVersion') "$directoryVersionPrefix.0" 'Directory.Build.props AssemblyVersion'
+
+$expectedAssemblyVersion = Resolve-StableAssemblyVersion $ExpectedVersion
+if ($null -ne $expectedAssemblyVersion) {
+    Assert-Equal (Get-ProjectProperty $directoryBuildPropsPath 'AssemblyVersion') $expectedAssemblyVersion 'Directory.Build.props AssemblyVersion'
+}
+
 Assert-Equal (Get-ProjectProperty $directoryBuildPropsPath 'FileVersion') "$directoryVersionPrefix.0" 'Directory.Build.props FileVersion'
 
 $projectFiles = @(Get-ChildItem -LiteralPath (Resolve-RepositoryPath 'src') -Recurse -Filter '*.csproj' -File | Sort-Object FullName)
