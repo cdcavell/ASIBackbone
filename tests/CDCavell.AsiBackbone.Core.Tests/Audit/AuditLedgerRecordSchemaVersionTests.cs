@@ -19,7 +19,7 @@ public sealed class AuditLedgerRecordSchemaVersionTests
     [Fact]
     public void FromResidueDefaultsAndSerializesStableSchemaVersion()
     {
-        AuditLedgerRecord record = AuditLedgerRecord.FromResidue(CreateValidResidue());
+        var record = AuditLedgerRecord.FromResidue(CreateValidResidue());
 
         Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, record.SchemaVersion);
         Assert.Equal(AsiBackboneSchemaVersions.StableArtifactsV1, ReadSerializedSchemaVersion(record));
@@ -31,7 +31,7 @@ public sealed class AuditLedgerRecordSchemaVersionTests
     [Fact]
     public void FromResiduePreservesAndSerializesExplicitSchemaVersion()
     {
-        AuditLedgerRecord record = AuditLedgerRecord.FromResidue(
+        var record = AuditLedgerRecord.FromResidue(
             CreateValidResidue(),
             schemaVersion: " 1.1-test ");
 
@@ -43,7 +43,7 @@ public sealed class AuditLedgerRecordSchemaVersionTests
     {
         string json = JsonSerializer.Serialize(record, JsonOptions);
 
-        using JsonDocument document = JsonDocument.Parse(json);
+        using var document = JsonDocument.Parse(json);
 
         return document.RootElement.GetProperty("schemaVersion").GetString()!;
     }
