@@ -3,3 +3,6 @@
 
 - name: Core Test Triage
   href: core-test-triage.md
+
+- name: External Consumer Smoke Test
+  href: external-consumer-smoke-test.md
