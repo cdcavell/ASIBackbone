@@ -7,6 +7,9 @@
 - name: 1.0.0 Quickstart
   href: quickstart-100.md
 
+- name: 1.0.0 Release Notes
+  href: release-notes-100.md
+
 - name: Why AsiBackbone?
   href: why-asi-backbone.md
 
