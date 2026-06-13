@@ -226,6 +226,127 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
             AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(request, options));
     }
 
+    [Fact]
+    public void ConstructorRejectsNullHandshakeRequest()
+    {
+        LiabilityHandshakeRequest request = CreateHandshakeRequest();
+
+        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() =>
+            new AsiBackboneAcknowledgmentChallenge(
+                null!,
+                request.HandshakeId,
+                request.OperationName,
+                request.ReasonCode,
+                request.Message,
+                request.RequiredAcknowledgmentCode,
+                request.RequiredAcknowledgmentText,
+                request.RiskLevel,
+                request.RiskCategory,
+                request.CorrelationId,
+                request.TraceId,
+                request.PolicyVersion,
+                request.PolicyHash,
+                request.Metadata));
+
+        Assert.Equal("handshakeRequest", exception.ParamName);
+    }
+
+    [Fact]
+    public void ConstructorRejectsMissingHandshakeId()
+    {
+        ArgumentException exception = Assert.Throws<ArgumentException>(() =>
+            CreateChallengeUsingInternalConstructor(handshakeId: " "));
+
+        Assert.Equal("handshakeId", exception.ParamName);
+    }
+
+    [Fact]
+    public void ConstructorRejectsMissingOperationName()
+    {
+        ArgumentException exception = Assert.Throws<ArgumentException>(() =>
+            CreateChallengeUsingInternalConstructor(operationName: " "));
+
+        Assert.Equal("operationName", exception.ParamName);
+    }
+
+    [Fact]
+    public void ConstructorRejectsMissingReasonCode()
+    {
+        ArgumentException exception = Assert.Throws<ArgumentException>(() =>
+            CreateChallengeUsingInternalConstructor(reasonCode: " "));
+
+        Assert.Equal("reasonCode", exception.ParamName);
+    }
+
+    [Fact]
+    public void ConstructorRejectsMissingRequiredAcknowledgmentCode()
+    {
+        ArgumentException exception = Assert.Throws<ArgumentException>(() =>
+            CreateChallengeUsingInternalConstructor(requiredAcknowledgmentCode: " "));
+
+        Assert.Equal("requiredAcknowledgmentCode", exception.ParamName);
+    }
+
+    [Fact]
+    public void ConstructorRejectsMissingRequiredAcknowledgmentText()
+    {
+        ArgumentException exception = Assert.Throws<ArgumentException>(() =>
+            CreateChallengeUsingInternalConstructor(requiredAcknowledgmentText: " "));
+
+        Assert.Equal("requiredAcknowledgmentText", exception.ParamName);
+    }
+
+    [Fact]
+    public void CreateChallengeRejectsNullActorBeforeDecision()
+    {
+        DefaultAsiBackboneAcknowledgmentChallengeService service = CreateService();
+
+        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() =>
+            service.CreateChallenge(null!, "RunOperation", null!));
+
+        Assert.Equal("actor", exception.ParamName);
+    }
+
+    private static AsiBackboneAcknowledgmentChallenge CreateChallengeUsingInternalConstructor(
+        string? handshakeId = null,
+        string? operationName = null,
+        string? reasonCode = null,
+        string? requiredAcknowledgmentCode = null,
+        string? requiredAcknowledgmentText = null)
+    {
+        LiabilityHandshakeRequest request = CreateHandshakeRequest();
+
+        return new AsiBackboneAcknowledgmentChallenge(
+            request,
+            handshakeId ?? request.HandshakeId,
+            operationName ?? request.OperationName,
+            reasonCode ?? request.ReasonCode,
+            request.Message,
+            requiredAcknowledgmentCode ?? request.RequiredAcknowledgmentCode,
+            requiredAcknowledgmentText ?? request.RequiredAcknowledgmentText,
+            request.RiskLevel,
+            request.RiskCategory,
+            request.CorrelationId,
+            request.TraceId,
+            request.PolicyVersion,
+            request.PolicyHash,
+            request.Metadata);
+    }
+
+    private static LiabilityHandshakeRequest CreateHandshakeRequest()
+    {
+        IAsiBackboneActorContext actor = AsiBackboneActorContext.Human("user-123");
+
+        return LiabilityHandshakeRequest.Create(
+            actor,
+            "RunOperation",
+            "ack.required",
+            "Acknowledgment required.",
+            "CONFIRM",
+            "Confirm responsibility.",
+            LiabilityHandshakeRiskLevel.Medium);
+    }
+
     private static DefaultAsiBackboneAcknowledgmentChallengeService CreateService(
         AsiBackboneAcknowledgmentChallengeOptions? options = null)
     {

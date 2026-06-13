@@ -7,7 +7,7 @@ namespace CDCavell.AsiBackbone.AspNetCore.Handshakes;
 /// </summary>
 public sealed class AsiBackboneAcknowledgmentChallenge
 {
-    private AsiBackboneAcknowledgmentChallenge(
+    internal AsiBackboneAcknowledgmentChallenge(
         LiabilityHandshakeRequest handshakeRequest,
         string handshakeId,
         string operationName,
